@@ -14,6 +14,8 @@
 
 ATPSCharacter::ATPSCharacter()
 {
+	PrimaryActorTick.bCanEverTick = true;
+
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
@@ -25,6 +27,9 @@ ATPSCharacter::ATPSCharacter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
+
+	GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -96.0f));
+	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
 
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
@@ -41,14 +46,78 @@ ATPSCharacter::ATPSCharacter()
 	// Create a follow camera
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
+	FollowCamera->SetRelativeLocation(FVector(70.0f, 70.0f, 70.0f));
+	FollowCamera->SetRelativeRotation(FRotator(0.0f,355.0f,0.0f));
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+	
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+	
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_MESH(TEXT("/Game/AnimStarterPack/UE4_Mannequin/Mesh/SK_Mannequin.SK_Mannequin"));
+	if (SK_MESH.Succeeded())
+	{
+		GetMesh()->SetSkeletalMesh(SK_MESH.Object);
+	}
+
+	static ConstructorHelpers::FClassFinder<UAnimInstance> _ANIM(TEXT("/Game/AnimStarterPack/UE4ASP_HeroTPP_AnimBlueprint.UE4ASP_HeroTPP_AnimBlueprint"));
+	if (_ANIM.Succeeded())
+	{
+		GetMesh()->SetAnimInstanceClass(_ANIM.Class);
+	}
+
+	SetControlMode(EControlMode::TPS);
+
+	ArmLegthSpeed = 25.0f;
+
 }
+
+void ATPSCharacter::SetControlMode(EControlMode NewControlMode)
+{
+	CurrentColtrolMode = NewControlMode;
+
+	if (CurrentColtrolMode == EControlMode::TPS)
+	{
+		//ArmLegthTo = 300.0f;
+		ArmLegthTo = 90.0f;
+	}
+	else if (CurrentColtrolMode == EControlMode::ZOOM)
+	{
+		//ArmLegthTo = 55.0f;
+		ArmLegthTo = 30.0f;
+	}
+}
+
+void ATPSCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+}
+
+void ATPSCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	// 카메라 암 이동 방법
+	//CameraBoom->TargetArmLength = FMath::FInterpTo(CameraBoom->TargetArmLength, ArmLegthTo, DeltaTime, ArmLegthSpeed);
+	
+	// 카메라 필드오브뷰 축소방법
+	FollowCamera->FieldOfView = FMath::FInterpTo(FollowCamera->FieldOfView, ArmLegthTo, DeltaTime, ArmLegthSpeed);
+
+	/*switch (CurrentColtrolMode)
+	{
+	case EControlMode::TPS:
+	case EControlMode::ZOOM:
+		CameraBoom->SetRelativeRotation(FMath::RInterpTo(CameraBoom->GetRelativeRotation(), ArmRotationTo, DeltaTime, ArmRotationSpeed));
+		break;
+	}*/
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 // Input
+// 
+// Called when the game starts or when spawned
 
 void ATPSCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
@@ -74,8 +143,33 @@ void ATPSCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInput
 
 	// VR headset functionality
 	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &ATPSCharacter::OnResetVR);
+
+	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &ATPSCharacter::Aim);
+
+	// Fire
+	//PlayerInputComponent->BindAction("Fire", this, &ATPSCharacter::Fire);
+
 }
 
+
+void ATPSCharacter::Fire()
+{
+	//Fire();
+}
+
+void ATPSCharacter::Aim()
+{
+	switch (CurrentColtrolMode)
+	{
+	case EControlMode::TPS:
+		SetControlMode(EControlMode::ZOOM);
+		break;
+	case EControlMode::ZOOM:
+		SetControlMode(EControlMode::TPS);
+		break;
+	}
+
+}
 
 void ATPSCharacter::OnResetVR()
 {
@@ -90,12 +184,12 @@ void ATPSCharacter::OnResetVR()
 
 void ATPSCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
 {
-		Jump();
+	Jump();
 }
 
 void ATPSCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
 {
-		StopJumping();
+	StopJumping();
 }
 
 void ATPSCharacter::TurnAtRate(float Rate)
