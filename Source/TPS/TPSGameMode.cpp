@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "TPSGameMode.h"
-#include "TPSCharacter.h"
+#include "Characters/TPSCharacter.h"
 #include "UObject/ConstructorHelpers.h"
 
 ATPSGameMode::ATPSGameMode()
@@ -11,5 +11,7 @@ ATPSGameMode::ATPSGameMode()
 	if (PlayerPawnBPClass.Class != NULL)
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
+
+		LOG_WARNING(TEXT("Game Mode Created"));
 	}
 }

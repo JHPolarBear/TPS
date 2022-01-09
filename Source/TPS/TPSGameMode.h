@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "CommonDefines.h"
 #include "GameFramework/GameModeBase.h"
 #include "TPSGameMode.generated.h"
 
