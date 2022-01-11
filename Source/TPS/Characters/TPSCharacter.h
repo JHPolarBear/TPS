@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "CommonDefines.h"
+#include "Weapons.h"
 #include "TPSCharacter.generated.h"
 
 UCLASS(config=Game)
@@ -28,6 +30,11 @@ public:
 	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
+
+	UPROPERTY(VisibleAnywhere)
+	class AWeapons* Weapon;
+
+	void WeaponEquip(E_WEAPON_TYPE e_CurrentWeaponType);
 
 protected:
 

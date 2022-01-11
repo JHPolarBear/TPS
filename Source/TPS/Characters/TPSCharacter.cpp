@@ -8,6 +8,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Rifle.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ATPSCharacter
@@ -50,7 +51,6 @@ ATPSCharacter::ATPSCharacter()
 	FollowCamera->SetRelativeRotation(FRotator(0.0f,355.0f,0.0f));
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 	
-
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 	
@@ -62,6 +62,7 @@ ATPSCharacter::ATPSCharacter()
 
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 
+	// Request Test
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_BP(TEXT("AnimBlueprint'/Game/AnimStarterPack/UE4ASP_HeroTPP_AnimBlueprint.UE4ASP_HeroTPP_AnimBlueprint_C'"));
 	if (ANIM_BP.Succeeded())
 	{
@@ -73,7 +74,41 @@ ATPSCharacter::ATPSCharacter()
 	ArmLegthSpeed = 25.0f;
 
 }
+void ATPSCharacter::WeaponEquip(E_WEAPON_TYPE e_CurrentWeaponType)
+{
+	FName WeaponSocket;
+	
+	switch (e_CurrentWeaponType)
+	{
+	case E_RIFLE:
+		WeaponSocket = TEXT("RifleWeaponSocket");
+		break;
+	case E_PISTOL:
+		WeaponSocket = TEXT("PistolWeaponSocket");
+		break;
+	default:
+		WeaponSocket = TEXT("RifleWeaponSocket");
+		break;
+	}
 
+	if (GetMesh()->DoesSocketExist(WeaponSocket))
+	{
+		UWorld* world = GetWorld();
+		if (world)
+		{
+			auto NewWeapon = world->SpawnActor<ARifle>(ARifle::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator);
+	
+			if (nullptr != NewWeapon)
+			{
+				Weapon = NewWeapon;
+				Weapon->SetActorHiddenInGame(false);
+				Weapon->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+				LOG_WARNING(TEXT("Weapon Aattch!"));
+				Weapon->GetAttachParentSocketName();
+			}
+		}
+	}
+}
 void ATPSCharacter::SetControlMode(EControlMode NewControlMode)
 {
 	CurrentColtrolMode = NewControlMode;
@@ -93,6 +128,10 @@ void ATPSCharacter::SetControlMode(EControlMode NewControlMode)
 void ATPSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+
+	// 소켓에 총 붙이기
+	WeaponEquip(E_RIFLE);
 
 }
 
