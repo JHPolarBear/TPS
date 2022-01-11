@@ -24,6 +24,9 @@ public:
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void OnUnPossess() override;
 
+	void RunAI();
+	void StopAI();
+
 private:
 
 	UPROPERTY()

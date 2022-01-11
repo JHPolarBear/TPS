@@ -60,7 +60,7 @@ ATPSCharacter::ATPSCharacter()
 		GetMesh()->SetSkeletalMesh(SK_MESH.Object);
 	}
 
-	static ConstructorHelpers::FClassFinder<UAnimInstance> _ANIM(TEXT("/Game/AnimStarterPack/UE4ASP_HeroTPP_AnimBlueprint.UE4ASP_HeroTPP_AnimBlueprint"));
+	static ConstructorHelpers::FClassFinder<UAnimInstance> _ANIM(TEXT("/Game/AnimStarterPack/UE4ASP_HeroTPP_AnimBlueprint.UE4ASP_HeroTPP_AnimBlueprint_C"));
 	if (_ANIM.Succeeded())
 	{
 		GetMesh()->SetAnimInstanceClass(_ANIM.Class);

@@ -14,8 +14,16 @@ class TPS_API ATPSMonsterBase : public ATPSCharacter
 {
 	GENERATED_BODY()
 
+public:
 	ATPSMonsterBase();
 
+	virtual void BeginPlay() override;
 
+	float GetRandomPatrolRadiusMax()	{return RandomPatrolRadiusMax;}
+
+private:
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI, meta = (AllowPrivateAccess = true) )
+	float RandomPatrolRadiusMax = 1000.f;
 	
 };

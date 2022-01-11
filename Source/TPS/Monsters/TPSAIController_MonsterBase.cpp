@@ -33,3 +33,24 @@ void ATPSAIController_MonsterBase::OnUnPossess()
 {
 	Super::OnUnPossess();
 }
+
+void ATPSAIController_MonsterBase::RunAI()
+{
+	if (UseBlackboard(BBAsset, Blackboard))
+	{
+		Blackboard->SetValueAsVector(StartPosKey, GetPawn()->GetActorLocation());
+		if (!RunBehaviorTree(BTAsset))
+		{
+			LOG_ERROR(TEXT("Failed to run behavior tree"));
+		}
+	}
+}
+
+void ATPSAIController_MonsterBase::StopAI()
+{
+	auto BehaivorTreeComponent = Cast<UBehaviorTreeComponent>(BrainComponent);
+	if(BehaivorTreeComponent != nullptr)
+	{
+		BehaivorTreeComponent->StopTree(EBTStopMode::Safe);
+	}
+}

@@ -22,3 +22,15 @@ ATPSMonsterBase::ATPSMonsterBase()
 		GetMesh()->SetAnimInstanceClass(_ANIM.Class);
 	}
 }
+
+void ATPSMonsterBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// Start ai behavior tree
+	ATPSAIController_MonsterBase* TPSAIController = Cast<ATPSAIController_MonsterBase>(GetController());
+	if(TPSAIController)
+	{
+		TPSAIController->RunAI();
+	}
+}
