@@ -13,6 +13,9 @@ class ATPSGameMode : public AGameModeBase
 
 public:
 	ATPSGameMode();
+
+	virtual void PostLogin(APlayerController* NewPlayer) override;
+
 };
 
 

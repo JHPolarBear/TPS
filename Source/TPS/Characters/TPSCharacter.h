@@ -31,8 +31,33 @@ public:
 
 protected:
 
+	enum class EControlMode
+	{
+		TPS,
+		ZOOM
+	};
+
+	void SetControlMode(EControlMode NewControlMode);
+	EControlMode CurrentColtrolMode = EControlMode::TPS;
+	FVector DirectionToMove = FVector::ZeroVector;
+
+	float ArmLegthTo = 0.0f;
+	FRotator ArmRotationTo = FRotator::ZeroRotator;
+	float ArmLegthSpeed = 0.0f;
+	float ArmRotationSpeed = 0.0f;
+
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	void Fire();
+
 	/** Resets HMD orientation in VR. */
 	void OnResetVR();
+
+	void Aim();
 
 	/** Called for forwards/backward input */
 	void MoveForward(float Value);
