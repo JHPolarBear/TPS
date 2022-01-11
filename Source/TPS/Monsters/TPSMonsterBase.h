@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "CommonDefines.h"
 #include "Characters/TPSCharacter.h"
 #include "TPSMonsterBase.generated.h"
 
@@ -13,5 +13,9 @@ UCLASS()
 class TPS_API ATPSMonsterBase : public ATPSCharacter
 {
 	GENERATED_BODY()
+
+	ATPSMonsterBase();
+
+
 	
 };
