@@ -62,10 +62,10 @@ ATPSCharacter::ATPSCharacter()
 
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 
-	static ConstructorHelpers::FClassFinder<UAnimInstance> _ANIM(TEXT("AnimBlueprint'/Game/AnimStarterPack/UE4ASP_HeroTPP_AnimBlueprint.UE4ASP_HeroTPP_AnimBlueprint_C'"));
-	if (_ANIM.Succeeded())
+	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_BP(TEXT("AnimBlueprint'/Game/AnimStarterPack/UE4ASP_HeroTPP_AnimBlueprint.UE4ASP_HeroTPP_AnimBlueprint_C'"));
+	if (ANIM_BP.Succeeded())
 	{
-		GetMesh()->SetAnimInstanceClass(_ANIM.Class);
+		GetMesh()->SetAnimInstanceClass(ANIM_BP.Class);
 	}
 
 	SetControlMode(EControlMode::TPS);
