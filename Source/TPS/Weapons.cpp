@@ -12,6 +12,11 @@ AWeapons::AWeapons()
 
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WEAPON"));
 	RootComponent = Weapon;
+
+	ProjectileClass = AProjectile::StaticClass();
+
+	FireRate = 0.05f;
+
 }
 
 void AWeapons::LoadSkeletalMeshType(E_WEAPON_TYPE e_WeaponType)
@@ -41,10 +46,65 @@ void AWeapons::LoadSkeletalMeshType(E_WEAPON_TYPE e_WeaponType)
 		break;
 	}
 
+	// Default offset from the character location for projectiles to spawn
+	SpawnOffset = FVector(0.0f, 60.0f, 0.0f);
+
 	Weapon->SetCollisionProfileName(TEXT("NoCollision"));
 }
 
+void AWeapons::OnFire()
+{
+	LOG_WARNING(TEXT("Weapon Fire!!!"));
+	// try and fire a projectile
+	if (ProjectileClass != NULL)
+	{
+		LOG_WARNING(TEXT("ProjectileClass!=NULL"));
 
+		FVector CameraLocation;
+		FRotator CameraRotation;
+		GetActorEyesViewPoint(CameraLocation, CameraRotation);
+
+		FVector MuzzleLocation = CameraLocation + FTransform(CameraRotation).TransformVector(SpawnOffset);
+		FRotator MuzzleRotation = CameraRotation + FRotator(0.0f, 90.0f, 0.0f);
+		
+		//MuzzleRotation.Pitch += 10.0f; 
+		UWorld* World = GetWorld(); 
+			
+		if (World) 
+		{ 
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this; 
+			SpawnParams.Instigator = GetInstigator();
+			AProjectile* Projectile = World->SpawnActor<AProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation, SpawnParams); 
+			if (Projectile) { 
+				FVector LaunchDirection = MuzzleRotation.Vector();
+				
+				Projectile->FireInDirection(LaunchDirection); 
+			} 
+		}
+	}
+	else
+	{
+		LOG_WARNING(TEXT("ProjectileClass=NULL"));
+	}
+
+	// try and play the sound if specified
+	if (FireSound != NULL)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+	}
+
+	// try and play a firing animation if specified
+	if (FireAnimation != NULL)
+	{
+		// Get the animation object for the arms mesh
+		UAnimInstance* AnimInstance = Weapon->GetAnimInstance();
+		if (AnimInstance != NULL)
+		{
+			AnimInstance->Montage_Play(FireAnimation, 1.f);
+		}
+	}
+}
 
 // Called when the game starts or when spawned
 void AWeapons::BeginPlay()

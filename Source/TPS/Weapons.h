@@ -5,10 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "WeaponDefines.h"
+#include "Projectile.h"
 #include "Weapons.generated.h"
 
 
-UCLASS()
+UCLASS(config = Game)
 class TPS_API AWeapons : public AActor
 {
 	GENERATED_BODY()
@@ -21,6 +22,9 @@ public:
 
 	E_WEAPON_TYPE mWeponType;
 
+	float FireRate;
+	float CurrentFireDeltaTime;
+
 	void SetWeaponType(E_WEAPON_TYPE e_WeaponType) { mWeponType = e_WeaponType;  };
 
 	//E_WEAPON_TYPE GetCurrWeaponType() { return e_CurrentWeaponType; };
@@ -30,6 +34,32 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category = Weapon)
 	USkeletalMeshComponent* Weapon;
+
+	/** Location on gun mesh where projectiles should spawn. */
+	/*UPROPERTY(VisibleDefaultsOnly)
+	class USceneComponent* MuzzleLocation;*/
+
+	/** Gun Spawn offset from the Weapon location */
+	UPROPERTY(EditAnywhere)
+	FVector SpawnOffset;
+
+	/** Sound to play each time we fire */
+	UPROPERTY(EditAnywhere)
+	class USoundBase* FireSound;
+
+	/** AnimMontage to play each time we fire */
+	UPROPERTY(EditAnywhere)
+	class UAnimMontage* FireAnimation;
+
+	/** Projectile class to spawn */
+	UPROPERTY(EditDefaultsOnly, Category = Projectile)
+	TSubclassOf<class AProjectile> ProjectileClass;
+
+	UFUNCTION()
+	void OnFire();
+
+	float GetFireRate() { return FireRate; };
+	void SetFireRate(float setFireRate) { FireRate = setFireRate; };
 
 protected:
 

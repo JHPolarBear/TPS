@@ -34,6 +34,11 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	class AWeapons* Weapon;
 
+	float FireDeltaTime;
+
+	///** Whether to use motion controller location for aiming. */
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	//bool bUsingMotionControllers;
 	void WeaponEquip(E_WEAPON_TYPE e_CurrentWeaponType);
 
 protected:
@@ -43,6 +48,12 @@ protected:
 		TPS,
 		ZOOM
 	};
+
+	UFUNCTION()
+	void OnFire();
+	UFUNCTION()
+	void OnFireStop();
+	bool isFiring;
 
 	void SetControlMode(EControlMode NewControlMode);
 	EControlMode CurrentColtrolMode = EControlMode::TPS;
@@ -58,8 +69,6 @@ protected:
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	void Fire();
 
 	/** Resets HMD orientation in VR. */
 	void OnResetVR();

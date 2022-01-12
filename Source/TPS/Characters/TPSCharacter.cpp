@@ -71,6 +71,8 @@ ATPSCharacter::ATPSCharacter()
 
 	SetControlMode(EControlMode::TPS);
 
+	FireDeltaTime = 0.0f;
+
 	ArmLegthSpeed = 25.0f;
 
 }
@@ -125,6 +127,19 @@ void ATPSCharacter::SetControlMode(EControlMode NewControlMode)
 	}
 }
 
+void ATPSCharacter::OnFireStop()
+{
+	LOG_WARNING(TEXT("On Stop!!!"));
+	isFiring = false;
+	FireDeltaTime = 0;
+}
+void ATPSCharacter::OnFire()
+{
+	LOG_WARNING(TEXT("On Fire!!!"));
+	isFiring = true;
+	// 첫발을 위해서 초기 셋팅
+	FireDeltaTime = Weapon->GetFireRate();
+}
 void ATPSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -145,6 +160,19 @@ void ATPSCharacter::Tick(float DeltaTime)
 	// 카메라 필드오브뷰 축소방법
 	FollowCamera->FieldOfView = FMath::FInterpTo(FollowCamera->FieldOfView, ArmLegthTo, DeltaTime, ArmLegthSpeed);
 
+	if (isFiring)
+	{
+		if (FireDeltaTime >= Weapon->GetFireRate())
+		{
+			Weapon->OnFire();
+			FireDeltaTime = 0.0f;
+		}
+		else
+		{
+			FireDeltaTime += DeltaTime;
+		}
+	}
+		
 	/*switch (CurrentColtrolMode)
 	{
 	case EControlMode::TPS:
@@ -187,15 +215,10 @@ void ATPSCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInput
 
 	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &ATPSCharacter::Aim);
 
-	// Fire
-	//PlayerInputComponent->BindAction("Fire", this, &ATPSCharacter::Fire);
+	// Fire event
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ATPSCharacter::OnFire);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ATPSCharacter::OnFireStop);
 
-}
-
-
-void ATPSCharacter::Fire()
-{
-	//Fire();
 }
 
 void ATPSCharacter::Aim()
