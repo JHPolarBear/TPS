@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "CommonDefines.h"
-#include "Weapons.h"
+#include "Weapons/Weapons.h"
 #include "TPSCharacter.generated.h"
 
 UCLASS(config=Game)
