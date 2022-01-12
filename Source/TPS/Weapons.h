@@ -22,6 +22,7 @@ public:
 
 	E_WEAPON_TYPE mWeponType;
 
+	bool bFullAutoFire;
 	float FireRate;
 	float CurrentFireDeltaTime;
 

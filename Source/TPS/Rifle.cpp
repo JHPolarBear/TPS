@@ -8,6 +8,7 @@ ARifle::ARifle()
 {
 	SetWeaponType(E_RIFLE);
 	LoadSkeletalMeshType(mWeponType);
+	bFullAutoFire = true;
 }
 
 // Called when the game starts or when spawned

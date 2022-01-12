@@ -166,6 +166,11 @@ void ATPSCharacter::Tick(float DeltaTime)
 		{
 			Weapon->OnFire();
 			FireDeltaTime = 0.0f;
+			// 단발 총(권총)인 경우에는 연발 안되게처리
+			if (!Weapon->bFullAutoFire)
+			{
+				isFiring = false;
+			}
 		}
 		else
 		{
