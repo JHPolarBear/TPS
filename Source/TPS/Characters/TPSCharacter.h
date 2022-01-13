@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "CommonDefines.h"
 #include "Weapons/Weapons.h"
+#include "TPSAnimInstance.h"
+#include "CharacterDefines.h"
 #include "TPSCharacter.generated.h"
 
 UCLASS(config=Game)
@@ -41,22 +43,33 @@ public:
 	//bool bUsingMotionControllers;
 	void WeaponEquip(E_WEAPON_TYPE e_CurrentWeaponType);
 
-protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Anim, meta = (AllowPrivateAccess = "true"))
+	bool IsBattleMode;
+	FORCEINLINE bool GetIsBattleMode() const { return IsBattleMode; }
 
-	enum class EControlMode
-	{
-		TPS,
-		ZOOM
-	};
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Anim, meta = (AllowPrivateAccess = "true"))
+	bool IsDeath;
+	FORCEINLINE bool GetIsDeath() const { return IsDeath; }
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Anim, meta = (AllowPrivateAccess = "true"))
+	bool IsFiring;
+
+	void SetIsFiring(bool setFiring);
+
+	FORCEINLINE bool GetIsFiring() const { return IsFiring; }
+
+protected:
 
 	UFUNCTION()
 	void OnFire();
 	UFUNCTION()
 	void OnFireStop();
-	bool isFiring;
 
-	void SetControlMode(EControlMode NewControlMode);
-	EControlMode CurrentColtrolMode = EControlMode::TPS;
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Anim)
+	class UTPSAnimInstance* TPSAnimInstance;
+
+	void SetControlMode(E_CONTROL_MODE NewControlMode);
+	E_CONTROL_MODE CurrentColtrolMode = E_CONTROL_MODE::NORMAL;
 	FVector DirectionToMove = FVector::ZeroVector;
 
 	float ArmLegthTo = 0.0f;

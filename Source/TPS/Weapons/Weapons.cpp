@@ -47,24 +47,25 @@ void AWeapons::LoadSkeletalMeshType(E_WEAPON_TYPE e_WeaponType)
 	}
 
 	// Default offset from the character location for projectiles to spawn
-	SpawnOffset = FVector(0.0f, 60.0f, 0.0f);
+	SpawnOffset = FVector(0.0f, 35.0f, 8.0f);
 
 	Weapon->SetCollisionProfileName(TEXT("NoCollision"));
 }
 
 void AWeapons::OnFire()
 {
-	LOG_WARNING(TEXT("Weapon Fire!!!"));
+	//LOG_WARNING(TEXT("Weapon Fire!!!"));
 	// try and fire a projectile
 	if (ProjectileClass != NULL)
 	{
-		LOG_WARNING(TEXT("ProjectileClass!=NULL"));
+		//LOG_WARNING(TEXT("ProjectileClass!=NULL"));
 
 		FVector CameraLocation;
 		FRotator CameraRotation;
 		GetActorEyesViewPoint(CameraLocation, CameraRotation);
 
-		FVector MuzzleLocation = CameraLocation + FTransform(CameraRotation).TransformVector(SpawnOffset);
+		
+		FVector MuzzleLocation = GetActorLocation() + FTransform(CameraRotation).TransformVector(SpawnOffset);
 		FRotator MuzzleRotation = CameraRotation + FRotator(0.0f, 90.0f, 0.0f);
 		
 		//MuzzleRotation.Pitch += 10.0f; 

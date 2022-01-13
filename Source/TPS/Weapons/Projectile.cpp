@@ -50,7 +50,7 @@ AProjectile::AProjectile()
 
 	// Die after 10 seconds by default
 	InitialLifeSpan = 10.0f;
-	LOG_WARNING(TEXT("PROJECTILE CREATE!!"));
+	//LOG_WARNING(TEXT("PROJECTILE CREATE!!"));
 }
 
 void AProjectile::FireInDirection(const FVector& ShootDirection)
