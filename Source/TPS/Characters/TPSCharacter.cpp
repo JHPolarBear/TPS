@@ -8,6 +8,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Weapons/Rifle.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ATPSCharacter
@@ -50,47 +51,132 @@ ATPSCharacter::ATPSCharacter()
 	FollowCamera->SetRelativeRotation(FRotator(0.0f,355.0f,0.0f));
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 	
-
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 	
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_MESH(TEXT("/Game/AnimStarterPack/UE4_Mannequin/Mesh/SK_Mannequin.SK_Mannequin"));
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SK_MESH(TEXT("SkeletalMesh'/Game/AnimStarterPack/UE4_Mannequin/Mesh/SK_Mannequin.SK_Mannequin'"));
 	if (SK_MESH.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(SK_MESH.Object);
 	}
 
-	static ConstructorHelpers::FClassFinder<UAnimInstance> _ANIM(TEXT("/Game/AnimStarterPack/UE4ASP_HeroTPP_AnimBlueprint.UE4ASP_HeroTPP_AnimBlueprint_C"));
-	if (_ANIM.Succeeded())
+	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+
+	// Request Test
+	//static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_BP(TEXT("AnimBlueprint'/Game/AnimStarterPack/UE4ASP_HeroTPP_AnimBlueprint.UE4ASP_HeroTPP_AnimBlueprint_C'"));
+	// TPS ANIM
+	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_BP(TEXT("AnimBlueprint'/Game/AnimStarterPack/UE4_Mannequin/TPS_AnimBlueprint.TPS_AnimBlueprint_C'"));
+	
+	if (ANIM_BP.Succeeded())
 	{
-		GetMesh()->SetAnimInstanceClass(_ANIM.Class);
+		GetMesh()->SetAnimInstanceClass(ANIM_BP.Class);
 	}
 
-	SetControlMode(EControlMode::TPS);
+	FireDeltaTime = 0.0f;
 
 	ArmLegthSpeed = 25.0f;
 
-}
+	IsDeath = false;
 
-void ATPSCharacter::SetControlMode(EControlMode NewControlMode)
+}
+void ATPSCharacter::WeaponEquip(E_WEAPON_TYPE e_CurrentWeaponType)
+{
+	FName WeaponSocket;
+	
+	switch (e_CurrentWeaponType)
+	{
+	case E_RIFLE:
+		WeaponSocket = TEXT("RifleWeaponSocket");
+		break;
+	case E_PISTOL:
+		WeaponSocket = TEXT("PistolWeaponSocket");
+		break;
+	default:
+		WeaponSocket = TEXT("RifleWeaponSocket");
+		break;
+	}
+
+	if (GetMesh()->DoesSocketExist(WeaponSocket))
+	{
+		UWorld* world = GetWorld();
+		if (world)
+		{
+			auto NewWeapon = world->SpawnActor<ARifle>(ARifle::StaticClass(), FVector::ZeroVector, FRotator::ZeroRotator);
+	
+			if (nullptr != NewWeapon)
+			{
+				Weapon = NewWeapon;
+				Weapon->SetActorHiddenInGame(false);
+				Weapon->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
+				//LOG_WARNING(TEXT("Weapon Aattch!"));
+				Weapon->GetAttachParentSocketName();
+			}
+		}
+	}
+}
+void ATPSCharacter::SetControlMode(E_CONTROL_MODE NewControlMode)
 {
 	CurrentColtrolMode = NewControlMode;
 
-	if (CurrentColtrolMode == EControlMode::TPS)
+	if (CurrentColtrolMode == E_CONTROL_MODE::NORMAL)
 	{
 		//ArmLegthTo = 300.0f;
+		IsBattleMode = false;
 		ArmLegthTo = 90.0f;
+
 	}
-	else if (CurrentColtrolMode == EControlMode::ZOOM)
+	else if (CurrentColtrolMode == E_CONTROL_MODE::BATTLE)
 	{
 		//ArmLegthTo = 55.0f;
+		IsBattleMode = true;
 		ArmLegthTo = 30.0f;
 	}
+
+	if (TPSAnimInstance != nullptr)
+	{
+		TPSAnimInstance->SetState((int)CurrentColtrolMode);
+	}
+
 }
 
+void ATPSCharacter::OnFireStop()
+{
+	LOG_WARNING(TEXT("On Stop!!!"));
+
+	SetIsFiring(false);
+
+	FireDeltaTime = 0;
+}
+void ATPSCharacter::OnFire()
+{
+	LOG_WARNING(TEXT("On Fire!!!"));
+	
+	SetIsFiring(true);
+
+	// 첫발을 위해서 초기 셋팅
+	FireDeltaTime = Weapon->GetFireRate();
+}
+
+void ATPSCharacter::SetIsFiring(bool setFiring)
+{
+	IsFiring = setFiring;
+	
+	if (TPSAnimInstance != nullptr)
+		TPSAnimInstance->SetIsAttack(IsFiring);
+}
 void ATPSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+
+	// 소켓에 총 붙이기
+	WeaponEquip(E_RIFLE);
+
+
+	TPSAnimInstance = Cast<UTPSAnimInstance>(GetMesh()->GetAnimInstance());
+
+	SetControlMode(E_CONTROL_MODE::NORMAL);
+
 
 }
 
@@ -104,6 +190,24 @@ void ATPSCharacter::Tick(float DeltaTime)
 	// 카메라 필드오브뷰 축소방법
 	FollowCamera->FieldOfView = FMath::FInterpTo(FollowCamera->FieldOfView, ArmLegthTo, DeltaTime, ArmLegthSpeed);
 
+	if (GetIsFiring())
+	{
+		if (FireDeltaTime >= Weapon->GetFireRate())
+		{
+			Weapon->OnFire();
+			FireDeltaTime = 0.0f;
+			// 단발 총(권총)인 경우에는 연발 안되게처리
+			if (!Weapon->bFullAutoFire)
+			{
+				SetIsFiring(false);
+			}
+		}
+		else
+		{
+			FireDeltaTime += DeltaTime;
+		}
+	}
+		
 	/*switch (CurrentColtrolMode)
 	{
 	case EControlMode::TPS:
@@ -146,26 +250,21 @@ void ATPSCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInput
 
 	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &ATPSCharacter::Aim);
 
-	// Fire
-	//PlayerInputComponent->BindAction("Fire", this, &ATPSCharacter::Fire);
+	// Fire event
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ATPSCharacter::OnFire);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ATPSCharacter::OnFireStop);
 
-}
-
-
-void ATPSCharacter::Fire()
-{
-	//Fire();
 }
 
 void ATPSCharacter::Aim()
 {
 	switch (CurrentColtrolMode)
 	{
-	case EControlMode::TPS:
-		SetControlMode(EControlMode::ZOOM);
+	case E_CONTROL_MODE::NORMAL:
+		SetControlMode(E_CONTROL_MODE::BATTLE);
 		break;
-	case EControlMode::ZOOM:
-		SetControlMode(EControlMode::TPS);
+	case E_CONTROL_MODE::BATTLE:
+		SetControlMode(E_CONTROL_MODE::NORMAL);
 		break;
 	}
 
