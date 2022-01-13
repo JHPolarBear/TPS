@@ -4,6 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "CommonDefines.h"
+#include "Weapons/Weapons.h"
+#include "TPSAnimInstance.h"
+#include "CharacterDefines.h"
 #include "TPSCharacter.generated.h"
 
 UCLASS(config=Game)
@@ -29,16 +33,43 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
 
+	UPROPERTY(VisibleAnywhere)
+	class AWeapons* Weapon;
+
+	float FireDeltaTime;
+
+	///** Whether to use motion controller location for aiming. */
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	//bool bUsingMotionControllers;
+	void WeaponEquip(E_WEAPON_TYPE e_CurrentWeaponType);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Anim, meta = (AllowPrivateAccess = "true"))
+	bool IsBattleMode;
+	FORCEINLINE bool GetIsBattleMode() const { return IsBattleMode; }
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Anim, meta = (AllowPrivateAccess = "true"))
+	bool IsDeath;
+	FORCEINLINE bool GetIsDeath() const { return IsDeath; }
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Anim, meta = (AllowPrivateAccess = "true"))
+	bool IsFiring;
+
+	void SetIsFiring(bool setFiring);
+
+	FORCEINLINE bool GetIsFiring() const { return IsFiring; }
+
 protected:
 
-	enum class EControlMode
-	{
-		TPS,
-		ZOOM
-	};
+	UFUNCTION()
+	void OnFire();
+	UFUNCTION()
+	void OnFireStop();
 
-	void SetControlMode(EControlMode NewControlMode);
-	EControlMode CurrentColtrolMode = EControlMode::TPS;
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Anim)
+	class UTPSAnimInstance* TPSAnimInstance;
+
+	void SetControlMode(E_CONTROL_MODE NewControlMode);
+	E_CONTROL_MODE CurrentColtrolMode = E_CONTROL_MODE::NORMAL;
 	FVector DirectionToMove = FVector::ZeroVector;
 
 	float ArmLegthTo = 0.0f;
@@ -51,8 +82,6 @@ protected:
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	void Fire();
 
 	/** Resets HMD orientation in VR. */
 	void OnResetVR();
