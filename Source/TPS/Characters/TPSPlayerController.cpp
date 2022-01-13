@@ -3,6 +3,8 @@
 
 #include "TPSPlayerController.h"
 
+class ATPSCharacter;
+
 void ATPSPlayerController::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
