@@ -3,6 +3,7 @@
 
 #include "Weapons.h"
 #include "CommonDefines.h"
+#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 
 // Sets default values
 AWeapons::AWeapons()
@@ -16,7 +17,7 @@ AWeapons::AWeapons()
 	ProjectileClass = AProjectile::StaticClass();
 
 	FireRate = 0.05f;
-
+	
 }
 
 void AWeapons::LoadSkeletalMeshType(E_WEAPON_TYPE e_WeaponType)
@@ -46,10 +47,33 @@ void AWeapons::LoadSkeletalMeshType(E_WEAPON_TYPE e_WeaponType)
 		break;
 	}
 
+	Weapon->SetCollisionProfileName(TEXT("NoCollision"));
+
 	// Default offset from the character location for projectiles to spawn
 	SpawnOffset = FVector(0.0f, 35.0f, 8.0f);
 
-	Weapon->SetCollisionProfileName(TEXT("NoCollision"));
+	ParticleSystemComponent = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleSystem"));
+	ParticleSystemComponent->SetupAttachment(RootComponent);
+	ParticleSystemComponent->bAutoActivate = false;
+	ParticleSystemComponent->SetHiddenInGame(false);
+	ParticleSystemComponent->SetRelativeLocation(SpawnOffset);
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("ParticleSystem'/Game/AnimStarterPack/UE4_Mannequin/P_Ranged_Firey_Impact.P_Ranged_Firey_Impact'"));
+
+	if (ParticleAsset.Succeeded())
+	{
+		ParticleSystemComponent->SetTemplate(ParticleAsset.Object);
+	}
+
+	AudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
+	AudioComponent->bAutoActivate = false;
+	AudioComponent->SetupAttachment(Weapon);
+
+	static ConstructorHelpers::FObjectFinder<USoundBase> FireSound(TEXT("SoundCue'/Game/AnimStarterPack/UE4_Mannequin/FireSound.FireSound'"));
+	if (FireSound.Succeeded())
+	{
+		AudioComponent->SetSound(FireSound.Object);
+	}
 }
 
 void AWeapons::OnFire()
@@ -76,6 +100,12 @@ void AWeapons::OnFire()
 			FActorSpawnParameters SpawnParams;
 			SpawnParams.Owner = this; 
 			SpawnParams.Instigator = GetInstigator();
+			AudioComponent->Play();
+
+			if (ParticleSystemComponent)
+				UGameplayStatics::SpawnEmitterAttached(ParticleSystemComponent->Template, Weapon, FName("Muzzle"));
+				//UGameplayStatics::SpawnEmitterAtLocation(World, ParticleSystemComponent->Template, MuzzleLocation);
+
 			AProjectile* Projectile = World->SpawnActor<AProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation, SpawnParams); 
 			if (Projectile) { 
 				FVector LaunchDirection = MuzzleRotation.Vector();
@@ -87,12 +117,6 @@ void AWeapons::OnFire()
 	else
 	{
 		LOG_WARNING(TEXT("ProjectileClass=NULL"));
-	}
-
-	// try and play the sound if specified
-	if (FireSound != NULL)
-	{
-		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
 	}
 
 	// try and play a firing animation if specified

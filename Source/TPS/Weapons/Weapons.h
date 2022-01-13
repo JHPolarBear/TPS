@@ -6,8 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "WeaponDefines.h"
 #include "Projectile.h"
+#include "Particles/ParticleSystemComponent.h"
 #include "Weapons.generated.h"
-
 
 UCLASS(config = Game)
 class TPS_API AWeapons : public AActor
@@ -36,6 +36,12 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = Weapon)
 	USkeletalMeshComponent* Weapon;
 
+	UPROPERTY(EditDefaultsOnly, Category = "FX")
+	UParticleSystemComponent* ParticleSystemComponent;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AUDIO")
+	UAudioComponent* AudioComponent;
+
 	/** Location on gun mesh where projectiles should spawn. */
 	/*UPROPERTY(VisibleDefaultsOnly)
 	class USceneComponent* MuzzleLocation;*/
@@ -43,10 +49,6 @@ public:
 	/** Gun Spawn offset from the Weapon location */
 	UPROPERTY(EditAnywhere)
 	FVector SpawnOffset;
-
-	/** Sound to play each time we fire */
-	UPROPERTY(EditAnywhere)
-	class USoundBase* FireSound;
 
 	/** AnimMontage to play each time we fire */
 	UPROPERTY(EditAnywhere)
