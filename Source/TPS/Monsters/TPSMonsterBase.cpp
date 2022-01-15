@@ -5,6 +5,8 @@
 #include "Monsters/TPSAIController_MonsterBase.h"
 #include "Characters/TPSCharacter.h"
 
+#include "Kismet/KismetMathLibrary.h"
+
 ATPSMonsterBase::ATPSMonsterBase()
 {
 	// Disable Camera component's tick
@@ -40,4 +42,31 @@ void ATPSMonsterBase::BeginPlay()
 	{
 		TPSAIController->RunAI();
 	}
+}
+
+void ATPSMonsterBase::AimTarget(FVector TargetLotation)
+{
+	FRotator LookAt = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetLotation);
+
+	SetActorRelativeRotation(FQuat(LookAt));
+}
+
+void ATPSMonsterBase::OnFire()
+{
+	LOG_WARNING(TEXT("MonsterBase On Fire!!!"));
+
+	if(GetIsFiring() == false)
+	{
+		SetIsFiring(true);
+
+		// 첫발을 위해서 초기 셋팅
+		FireDeltaTime = Weapon->GetFireRate();
+	}
+}
+
+void ATPSMonsterBase::OnFireStop()
+{
+	LOG_WARNING(TEXT("MonsterBase On Fire Stop!!!"));
+
+	Super::OnFireStop();
 }

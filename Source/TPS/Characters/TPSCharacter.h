@@ -61,9 +61,9 @@ public:
 protected:
 
 	UFUNCTION()
-	void OnFire();
+	virtual void OnFire();
 	UFUNCTION()
-	void OnFireStop();
+	virtual void OnFireStop();
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Anim)
 	class UTPSAnimInstance* TPSAnimInstance;

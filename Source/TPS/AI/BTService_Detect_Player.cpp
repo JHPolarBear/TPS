@@ -25,7 +25,12 @@ void UBTService_Detect_Player::TickNode(UBehaviorTreeComponent& OwnerComp, uint8
 
 	UWorld* World = ControllingPawn->GetWorld();
 	FVector Center = ControllingPawn->GetActorLocation();
-	float DetectRadius = 600.f;
+
+	float DetectRadius = 1000.f;
+	float FireRangeRadius = 600.f;
+
+	ATPSCharacter* TPSCharacterTarget = nullptr;
+	bool IsAttackable = false;
 
 	if(World == nullptr)
 		return;
@@ -43,6 +48,7 @@ void UBTService_Detect_Player::TickNode(UBehaviorTreeComponent& OwnerComp, uint8
 	);
 
 	DrawDebugSphere(World, Center, DetectRadius, 16, FColor::Red, false, 0.4f);
+	DrawDebugSphere(World, Center, FireRangeRadius, 16, FColor::Blue, false, 0.4f);
 
 	if(bResult)
 	{
@@ -51,21 +57,22 @@ void UBTService_Detect_Player::TickNode(UBehaviorTreeComponent& OwnerComp, uint8
 			ATPSCharacter* TPSCharacter = Cast<ATPSCharacter>(OverlapResult.GetActor());
 			if(TPSCharacter && TPSCharacter->GetController()->IsPlayerController())
 			{
-				OwnerComp.GetBlackboardComponent()->SetValueAsObject(ATPSAIController_MonsterBase::TargetKey, TPSCharacter);				
+				TPSCharacterTarget = TPSCharacter;
 
 				DrawDebugPoint(World, TPSCharacter->GetActorLocation(), 10.f, FColor::Blue, false, 0.2f);
 
 				DrawDebugLine(World, Center, TPSCharacter->GetActorLocation(), FColor::Blue, false, 0.2f);
 
-				return;
+				if(ControllingPawn->GetDistanceTo(TPSCharacter) <= FireRangeRadius)
+				{
+					IsAttackable = true;
+				}
+
+				break;
 			}
 		}
-
-		OwnerComp.GetBlackboardComponent()->SetValueAsObject(ATPSAIController_MonsterBase::TargetKey, nullptr);
-	}
-	else
-	{
-		OwnerComp.GetBlackboardComponent()->SetValueAsObject(ATPSAIController_MonsterBase::TargetKey, nullptr);
 	}
 
+	OwnerComp.GetBlackboardComponent()->SetValueAsObject(ATPSAIController_MonsterBase::TargetKey, TPSCharacterTarget);
+	OwnerComp.GetBlackboardComponent()->SetValueAsBool(ATPSAIController_MonsterBase::IsAttackableKey, IsAttackable);
 }

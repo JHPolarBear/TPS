@@ -8,6 +8,7 @@
 const FName ATPSAIController_MonsterBase::StartPosKey(TEXT("StartPos"));
 const FName ATPSAIController_MonsterBase::NextPosKey(TEXT("NextPos"));
 const FName ATPSAIController_MonsterBase::TargetKey(TEXT("Target"));
+const FName ATPSAIController_MonsterBase::IsAttackableKey(TEXT("IsAttackable"));
 
 ATPSAIController_MonsterBase::ATPSAIController_MonsterBase()
 {
