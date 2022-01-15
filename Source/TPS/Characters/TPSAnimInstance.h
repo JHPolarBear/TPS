@@ -20,6 +20,15 @@ private:
 		float Velocity;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Pawn, meta = (AllowPrivateAccess = "true"))
+		float Direction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pawn, meta = (AllowPrivateAccess = "true"))
+		float AimVertical;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pawn, meta = (AllowPrivateAccess = "true"))
+		float AimHorizontal;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Pawn, meta = (AllowPrivateAccess = "true"))
 		int State;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Pawn, meta = (AllowPrivateAccess = "true"))
@@ -30,6 +39,10 @@ public:
 
 	void SetState(int set_State) { State = set_State; };
 	void SetIsAttack(bool set_Attack) { IsAttack = set_Attack; };
+	void SetAimVertical(float vertical) { AimVertical = vertical; };
+	void SetAimHorizontal(float horizontal) { AimHorizontal = horizontal; };
+	float GetAimVertical() { return AimVertical; };
+	float GetAimHorizontal() { return AimHorizontal; };
 
 
 };
