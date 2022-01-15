@@ -15,6 +15,7 @@ ARifle::ARifle()
 void ARifle::BeginPlay()
 {
 	Super::BeginPlay();
+	SetFireRate(0.1f);
 	
 }
 
