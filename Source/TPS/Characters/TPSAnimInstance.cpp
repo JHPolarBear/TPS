@@ -6,6 +6,7 @@
 UTPSAnimInstance::UTPSAnimInstance()
 {
 	Velocity = 0.0f;
+	Direction = 0.0f;
 
 	IsAttack = false;
 
@@ -20,5 +21,6 @@ void UTPSAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (::IsValid(Pawn))
 	{
 		Velocity = Pawn->GetVelocity().Size();
+		Direction = CalculateDirection(Pawn->GetVelocity(), Pawn->GetActorRotation());
 	}
 }
