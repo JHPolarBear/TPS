@@ -20,6 +20,7 @@ public:
 	static const FName StartPosKey;
 	static const FName NextPosKey;
 	static const FName TargetKey;
+	static const FName IsAttackableKey;
 
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void OnUnPossess() override;

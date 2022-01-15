@@ -21,6 +21,13 @@ public:
 
 	float GetRandomPatrolRadiusMax()	{return RandomPatrolRadiusMax;}
 
+public:
+	void AimTarget(FVector TargetLotation);
+
+	virtual void OnFire();
+
+	virtual void OnFireStop();
+
 private:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI, meta = (AllowPrivateAccess = true) )
