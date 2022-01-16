@@ -22,6 +22,10 @@ public:
 
 	E_WEAPON_TYPE mWeponType;
 
+	int nMaxBulletNum;
+	int nCurrentBulletNum;
+	bool bIsReloading;
+
 	bool bFullAutoFire;
 	float FireRate;
 	float CurrentFireDeltaTime;

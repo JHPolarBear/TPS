@@ -48,6 +48,12 @@ public:
 	FORCEINLINE bool GetIsBattleMode() const { return IsBattleMode; }
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Anim, meta = (AllowPrivateAccess = "true"))
+	int nMaxHealth;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Anim, meta = (AllowPrivateAccess = "true"))
+	int nCurrentHealth;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Anim, meta = (AllowPrivateAccess = "true"))
 	bool IsDeath;
 	FORCEINLINE bool GetIsDeath() const { return IsDeath; }
 
@@ -111,6 +117,10 @@ protected:
 
 	/** Handler for when a touch input stops. */
 	void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
+
+	FTimerHandle ReloadTimer;
+	void OnReloadingStart();
+	void OnReloadingEnd();
 
 protected:
 	// APawn interface

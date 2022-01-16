@@ -50,5 +50,5 @@ void ATPSHUD::DrawHUD()
 
 	FString _String = FString::Printf(TEXT("."));
 	DrawText(_String, FColor::Red, CrosshairDrawPosition.X, CrosshairDrawPosition.Y, HUDFont,1.5f);
-
+	
 }

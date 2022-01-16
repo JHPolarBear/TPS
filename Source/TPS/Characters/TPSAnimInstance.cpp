@@ -9,6 +9,7 @@ UTPSAnimInstance::UTPSAnimInstance()
 	Direction = 0.0f;
 
 	IsAttack = false;
+	IsReloading = false;
 
 	State = (int) E_CONTROL_MODE::NORMAL;
 }

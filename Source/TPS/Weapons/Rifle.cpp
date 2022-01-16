@@ -9,6 +9,10 @@ ARifle::ARifle()
 	SetWeaponType(E_RIFLE);
 	LoadSkeletalMeshType(mWeponType);
 	bFullAutoFire = true;
+
+	nMaxBulletNum = 30;
+	nCurrentBulletNum = nMaxBulletNum;
+	FireRate = 0.08f;
 }
 
 // Called when the game starts or when spawned

@@ -79,6 +79,9 @@ ATPSCharacter::ATPSCharacter()
 
 	IsDeath = false;
 
+	nMaxHealth = 100;
+	nCurrentHealth = nMaxHealth;
+
 }
 void ATPSCharacter::WeaponEquip(E_WEAPON_TYPE e_CurrentWeaponType)
 {
@@ -255,6 +258,42 @@ void ATPSCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInput
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ATPSCharacter::OnFire);
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ATPSCharacter::OnFireStop);
 
+	PlayerInputComponent->BindAction("Reloading", IE_Released, this, &ATPSCharacter::OnReloadingStart);
+}
+void ATPSCharacter::OnReloadingStart()
+{
+	LOG_WARNING(TEXT("OnReloadingStart!!!"));
+
+	// 장전중 다시누르면 장전 취소
+	if(Weapon->bIsReloading)
+	{
+		Weapon->bIsReloading = false;
+		TPSAnimInstance->SetIsReloading(Weapon->bIsReloading);
+
+		GetWorldTimerManager().ClearTimer(ReloadTimer);
+		LOG_WARNING(TEXT("OnReloadingStart Cancel!!!"));
+	}
+	// 장전시작
+	else
+	{
+		Weapon->bIsReloading = true;
+		TPSAnimInstance->SetIsReloading(Weapon->bIsReloading);
+
+		GetWorldTimerManager().SetTimer(ReloadTimer, this, &ATPSCharacter::OnReloadingEnd, 2, false);
+		LOG_WARNING(TEXT("OnReloadingStart2!!!"));
+	}
+}
+
+void ATPSCharacter::OnReloadingEnd() 
+{
+	// 호출됐을때 장전중이었으면 탄창 최대로 채워주고 장전 액션 종료.
+	if (Weapon->bIsReloading)
+	{
+		Weapon->bIsReloading = false;
+		TPSAnimInstance->SetIsReloading(Weapon->bIsReloading);
+		Weapon->nCurrentBulletNum = Weapon->nMaxBulletNum;
+		LOG_WARNING(TEXT("OnReloadingEnd!!!"));
+	}
 }
 
 void ATPSCharacter::Aim()

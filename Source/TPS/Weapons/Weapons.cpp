@@ -16,7 +16,9 @@ AWeapons::AWeapons()
 
 	ProjectileClass = AProjectile::StaticClass();
 
-	FireRate = 0.05f;
+	FireRate = 0.1f;
+
+	bIsReloading = false;
 	
 }
 
@@ -80,54 +82,60 @@ void AWeapons::OnFire()
 {
 	//LOG_WARNING(TEXT("Weapon Fire!!!"));
 	// try and fire a projectile
-	if (ProjectileClass != NULL)
+	
+	// 현재 총알이남았고, 재장전 아닐때~
+	if ( nCurrentBulletNum > 0 && !bIsReloading )
 	{
-		//LOG_WARNING(TEXT("ProjectileClass!=NULL"));
-
-		FVector CameraLocation;
-		FRotator CameraRotation;
-		GetActorEyesViewPoint(CameraLocation, CameraRotation);
-
-		
-		FVector MuzzleLocation = GetActorLocation() + FTransform(CameraRotation).TransformVector(SpawnOffset);
-		FRotator MuzzleRotation = CameraRotation + FRotator(0.0f, 90.0f, 0.0f);
-		
-		//MuzzleRotation.Pitch += 10.0f; 
-		UWorld* World = GetWorld(); 
-			
-		if (World) 
-		{ 
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.Owner = this; 
-			SpawnParams.Instigator = GetInstigator();
-			AudioComponent->Play();
-
-			if (ParticleSystemComponent)
-				UGameplayStatics::SpawnEmitterAttached(ParticleSystemComponent->Template, Weapon, FName("Muzzle"));
-				//UGameplayStatics::SpawnEmitterAtLocation(World, ParticleSystemComponent->Template, MuzzleLocation);
-
-			AProjectile* Projectile = World->SpawnActor<AProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation, SpawnParams); 
-			if (Projectile) { 
-				FVector LaunchDirection = MuzzleRotation.Vector();
-				
-				Projectile->FireInDirection(LaunchDirection); 
-			} 
-		}
-	}
-	else
-	{
-		LOG_WARNING(TEXT("ProjectileClass=NULL"));
-	}
-
-	// try and play a firing animation if specified
-	if (FireAnimation != NULL)
-	{
-		// Get the animation object for the arms mesh
-		UAnimInstance* AnimInstance = Weapon->GetAnimInstance();
-		if (AnimInstance != NULL)
+		if (ProjectileClass != NULL)
 		{
-			AnimInstance->Montage_Play(FireAnimation, 1.f);
+			//LOG_WARNING(TEXT("ProjectileClass!=NULL"));
+
+			FVector CameraLocation;
+			FRotator CameraRotation;
+			GetActorEyesViewPoint(CameraLocation, CameraRotation);
+
+		
+			FVector MuzzleLocation = GetActorLocation() + FTransform(CameraRotation).TransformVector(SpawnOffset);
+			FRotator MuzzleRotation = CameraRotation + FRotator(0.0f, 90.0f, 0.0f);
+		
+			//MuzzleRotation.Pitch += 10.0f; 
+			UWorld* World = GetWorld(); 
+			
+			if (World) 
+			{ 
+				FActorSpawnParameters SpawnParams;
+				SpawnParams.Owner = this; 
+				SpawnParams.Instigator = GetInstigator();
+				AudioComponent->Play();
+
+				if (ParticleSystemComponent)
+					UGameplayStatics::SpawnEmitterAttached(ParticleSystemComponent->Template, Weapon, FName("Muzzle"));
+					//UGameplayStatics::SpawnEmitterAtLocation(World, ParticleSystemComponent->Template, MuzzleLocation);
+
+				AProjectile* Projectile = World->SpawnActor<AProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation, SpawnParams); 
+				if (Projectile) { 
+					FVector LaunchDirection = MuzzleRotation.Vector();
+				
+					Projectile->FireInDirection(LaunchDirection); 
+				} 
+			}
 		}
+		else
+		{
+			LOG_WARNING(TEXT("ProjectileClass=NULL"));
+		}
+
+		//// try and play a firing animation if specified
+		//if (FireAnimation != NULL)
+		//{
+		//	// Get the animation object for the arms mesh
+		//	UAnimInstance* AnimInstance = Weapon->GetAnimInstance();
+		//	if (AnimInstance != NULL)
+		//	{
+		//		AnimInstance->Montage_Play(FireAnimation, 1.f);
+		//	}
+		//}
+		nCurrentBulletNum--;
 	}
 }
 
