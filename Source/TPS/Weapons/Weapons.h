@@ -29,6 +29,11 @@ public:
 	bool bFullAutoFire;
 	float FireRate;
 	float CurrentFireDeltaTime;
+	
+	FVector MuzzleLocation;
+	FRotator MuzzleRotation;
+
+	FVector GetMuzzleLocation() {return MuzzleLocation; };
 
 	void SetWeaponType(E_WEAPON_TYPE e_WeaponType) { mWeponType = e_WeaponType;  };
 
@@ -39,6 +44,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category = Weapon)
 	USkeletalMeshComponent* Weapon;
+
+	UPROPERTY(VisibleAnywhere)
+	class UWeaponLineTrace* LineTrace;
 
 	UPROPERTY(EditDefaultsOnly, Category = "FX")
 	UParticleSystemComponent* ParticleSystemComponent;
@@ -63,7 +71,7 @@ public:
 	TSubclassOf<class AProjectile> ProjectileClass;
 
 	UFUNCTION()
-	void OnFire();
+	void OnFire(ATPSCharacter* Character);
 
 	float GetFireRate() { return FireRate; };
 	void SetFireRate(float setFireRate) { FireRate = setFireRate; };

@@ -33,8 +33,8 @@ ATPSCharacter::ATPSCharacter()
 	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
 
 	// Configure character movement
-	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
-	GetCharacterMovement()->bUseControllerDesiredRotation = false;
+	GetCharacterMovement()->bOrientRotationToMovement = false; // Character moves in the direction of input...	
+	GetCharacterMovement()->bUseControllerDesiredRotation = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
 	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
@@ -198,7 +198,10 @@ void ATPSCharacter::Tick(float DeltaTime)
 	{
 		if (FireDeltaTime >= Weapon->GetFireRate())
 		{
-			Weapon->OnFire();
+			if (Weapon)
+			{
+				Weapon->OnFire(this);
+			}
 			FireDeltaTime = 0.0f;
 			// 단발 총(권총)인 경우에는 연발 안되게처리
 			if (!Weapon->bFullAutoFire)

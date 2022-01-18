@@ -39,7 +39,7 @@ void ATPSHUD::DrawHUD()
 	const FVector2D Center(Canvas->ClipX * 0.5f, Canvas->ClipY * 0.5f);
 
 	// offset by half the texture's dimensions so that the center of the texture aligns with the center of the Canvas
-	const FVector2D CrosshairDrawPosition((Center.X),(Center.Y + 20.0f));
+	const FVector2D CrosshairDrawPosition((Center.X),(Center.Y));
 
 	// 조준점 텍스쳐 필요
 	//// draw the crosshair
@@ -48,7 +48,7 @@ void ATPSHUD::DrawHUD()
 	//Canvas->DrawItem(TileItem);
 
 
-	FString _String = FString::Printf(TEXT("."));
-	DrawText(_String, FColor::Red, CrosshairDrawPosition.X, CrosshairDrawPosition.Y, HUDFont,1.5f);
+	//FString _String = FString::Printf(TEXT("."));
+	//DrawText(_String, FColor::Green, CrosshairDrawPosition.X, CrosshairDrawPosition.Y, HUDFont,1.0f);
 	
 }

@@ -4,6 +4,8 @@
 #include "Weapons.h"
 #include "CommonDefines.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
+#include "Characters/TPSCharacter.h"
+#include "WeaponLineTrace.h"
 
 // Sets default values
 AWeapons::AWeapons()
@@ -19,6 +21,10 @@ AWeapons::AWeapons()
 	FireRate = 0.1f;
 
 	bIsReloading = false;
+	MuzzleLocation = FVector::ZeroVector;
+	MuzzleRotation = FRotator::ZeroRotator;
+
+	LineTrace = NewObject<UWeaponLineTrace>();
 	
 }
 
@@ -78,7 +84,7 @@ void AWeapons::LoadSkeletalMeshType(E_WEAPON_TYPE e_WeaponType)
 	}
 }
 
-void AWeapons::OnFire()
+void AWeapons::OnFire(ATPSCharacter* Character)
 {
 	//LOG_WARNING(TEXT("Weapon Fire!!!"));
 	// try and fire a projectile
@@ -94,10 +100,21 @@ void AWeapons::OnFire()
 			FRotator CameraRotation;
 			GetActorEyesViewPoint(CameraLocation, CameraRotation);
 
-		
-			FVector MuzzleLocation = GetActorLocation() + FTransform(CameraRotation).TransformVector(SpawnOffset);
-			FRotator MuzzleRotation = CameraRotation + FRotator(0.0f, 90.0f, 0.0f);
-		
+			FQuat rotator = FQuat(Character->GetControlRotation());
+			
+			FVector WorldLocation;
+			FVector WorldDirection;
+			int x, y;
+			Character->GetWorld()->GetFirstPlayerController()->GetViewportSize(x, y);
+			Character->GetWorld()->GetFirstPlayerController()->DeprojectScreenPositionToWorld(x * 0.5f, y * 0.5f, WorldLocation, WorldDirection);
+
+			MuzzleLocation = GetActorLocation() + FTransform(CameraRotation).TransformVector(SpawnOffset);
+			MuzzleRotation = Character->GetControlRotation(); //CameraRotation + FRotator(0.0f, 90.0f, 0.0f);
+
+			FVector location = MuzzleLocation;
+			FVector start = location;
+			FVector end = location + rotator.GetForwardVector() * 1000.f;
+
 			//MuzzleRotation.Pitch += 10.0f; 
 			UWorld* World = GetWorld(); 
 			
@@ -114,9 +131,11 @@ void AWeapons::OnFire()
 
 				AProjectile* Projectile = World->SpawnActor<AProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation, SpawnParams); 
 				if (Projectile) { 
-					FVector LaunchDirection = MuzzleRotation.Vector();
-				
-					Projectile->FireInDirection(LaunchDirection); 
+					
+					//FVector LaunchDirection = MuzzleRotation.Vector();
+					//Projectile->FireInDirection(LaunchDirection); 
+					Projectile->FireInDirection(WorldDirection); 
+					
 				} 
 			}
 		}
@@ -124,6 +143,8 @@ void AWeapons::OnFire()
 		{
 			LOG_WARNING(TEXT("ProjectileClass=NULL"));
 		}
+		if (LineTrace)
+			LineTrace->OnFire(Character);
 
 		//// try and play a firing animation if specified
 		//if (FireAnimation != NULL)
