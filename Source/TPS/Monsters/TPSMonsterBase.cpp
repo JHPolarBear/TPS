@@ -53,10 +53,10 @@ void ATPSMonsterBase::AimTarget(FVector TargetLotation)
 
 void ATPSMonsterBase::OnFire()
 {
-	LOG_WARNING(TEXT("MonsterBase On Fire!!!"));
-
 	if(GetIsFiring() == false)
 	{
+		LOG_WARNING(TEXT("MonsterBase On Fire!!!"));
+
 		SetIsFiring(true);
 
 		// 첫발을 위해서 초기 셋팅
