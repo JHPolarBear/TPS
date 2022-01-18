@@ -12,7 +12,7 @@
 ATPSHUD::ATPSHUD()
 {
 	// Set the crosshair texture
-	static ConstructorHelpers::FObjectFinder<UTexture2D> CrosshairTexObj(TEXT("Texture2D'/Game/unnamed.unnamed'"));
+	static ConstructorHelpers::FObjectFinder<UTexture2D> CrosshairTexObj(TEXT("Texture2D'/Game/Textures/FirstPersonCrosshair.FirstPersonCrosshair'"));
 	if (CrosshairTexObj.Succeeded())
 	{
 		CrosshairTex = CrosshairTexObj.Object;
@@ -38,14 +38,20 @@ void ATPSHUD::DrawHUD()
 	// find center of the Canvas
 	const FVector2D Center(Canvas->ClipX * 0.5f, Canvas->ClipY * 0.5f);
 
-	// offset by half the texture's dimensions so that the center of the texture aligns with the center of the Canvas
-	const FVector2D CrosshairDrawPosition((Center.X),(Center.Y));
+	int OffsetX = CrosshairTex->GetSizeX() * 0.5f;
+	int OffsetY = CrosshairTex->GetSizeY() * 0.5f;
 
-	// 조준점 텍스쳐 필요
-	//// draw the crosshair
-	//FCanvasTileItem TileItem(CrosshairDrawPosition, CrosshairTex->Resource, FLinearColor::White);
-	//TileItem.BlendMode = SE_BLEND_Translucent;
-	//Canvas->DrawItem(TileItem);
+	// offset by half the texture's dimensions so that the center of the texture aligns with the center of the Canvas
+	const FVector2D CrosshairDrawPosition((Center.X - OffsetX), (Center.Y - OffsetY));
+
+	// draw the crosshair
+	FCanvasTileItem TileItem(CrosshairDrawPosition, CrosshairTex->Resource, FLinearColor::White);
+	TileItem.BlendMode = SE_BLEND_Translucent;
+	
+
+
+
+	Canvas->DrawItem(TileItem);
 
 
 	//FString _String = FString::Printf(TEXT("."));
