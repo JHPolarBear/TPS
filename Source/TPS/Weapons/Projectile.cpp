@@ -23,8 +23,12 @@ AProjectile::AProjectile()
 	// Players can't walk on it
 	CollisionComponent->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
 	CollisionComponent->CanCharacterStepUpOn = ECB_No;
-
 	CollisionComponent->SetHiddenInGame(true);
+	CollisionComponent->SetEnableGravity(false);
+	CollisionComponent->SetSimulatePhysics(false);
+	CollisionComponent->SetGenerateOverlapEvents(true);
+	CollisionComponent->SetCollisionResponseToAllChannels(ECR_Block);
+
 	// Set as root component
 	RootComponent = CollisionComponent;
 
@@ -37,16 +41,18 @@ AProjectile::AProjectile()
 		MeshComponent->SetRelativeRotation( FRotator(0, -90.0f, 0) );
 		MeshComponent->SetWorldScale3D(FVector(5.0f));
 		MeshComponent->SetupAttachment(CollisionComponent);
+		MeshComponent->SetEnableGravity(false);
 	}
-
 
 	// Use a ProjectileMovementComponent to govern this projectile's movement
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComponent"));
 	ProjectileMovement->UpdatedComponent = RootComponent;
-	ProjectileMovement->InitialSpeed = 5000.f;
-	ProjectileMovement->MaxSpeed = 5000.f;
+	ProjectileMovement->InitialSpeed = 10000.f;
+	ProjectileMovement->MaxSpeed = 10000.f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = true;
+	//  중력 없이
+	ProjectileMovement->ProjectileGravityScale = 0.0f;
 
 	// Die after 10 seconds by default
 	InitialLifeSpan = 10.0f;
@@ -61,10 +67,11 @@ void AProjectile::FireInDirection(const FVector& ShootDirection)
 void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
 {
 	// Only add impulse and destroy projectile if we hit a physics
-	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComponent != NULL) && OtherComponent->IsSimulatingPhysics())
+	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComponent != NULL)/* && OtherComponent->IsSimulatingPhysics()*/)
 	{
-		OtherComponent->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
+		//OtherComponent->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
 
+		LOG_WARNING(TEXT("Hit!! Destroy"));
 		Destroy();
 	}
 }

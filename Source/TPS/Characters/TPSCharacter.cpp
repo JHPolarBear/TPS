@@ -33,8 +33,8 @@ ATPSCharacter::ATPSCharacter()
 	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
 
 	// Configure character movement
-	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
-	GetCharacterMovement()->bUseControllerDesiredRotation = false;
+	GetCharacterMovement()->bOrientRotationToMovement = false; // Character moves in the direction of input...	
+	GetCharacterMovement()->bUseControllerDesiredRotation = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
 	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
@@ -78,6 +78,9 @@ ATPSCharacter::ATPSCharacter()
 	ArmLegthSpeed = 25.0f;
 
 	IsDeath = false;
+
+	nMaxHealth = 100;
+	nCurrentHealth = nMaxHealth;
 
 }
 void ATPSCharacter::WeaponEquip(E_WEAPON_TYPE e_CurrentWeaponType)
@@ -195,7 +198,10 @@ void ATPSCharacter::Tick(float DeltaTime)
 	{
 		if (FireDeltaTime >= Weapon->GetFireRate())
 		{
-			Weapon->OnFire();
+			if (Weapon)
+			{
+				Weapon->OnFire(this);
+			}
 			FireDeltaTime = 0.0f;
 			// 단발 총(권총)인 경우에는 연발 안되게처리
 			if (!Weapon->bFullAutoFire)
@@ -255,6 +261,42 @@ void ATPSCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInput
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ATPSCharacter::OnFire);
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ATPSCharacter::OnFireStop);
 
+	PlayerInputComponent->BindAction("Reloading", IE_Released, this, &ATPSCharacter::OnReloadingStart);
+}
+void ATPSCharacter::OnReloadingStart()
+{
+	LOG_WARNING(TEXT("OnReloadingStart!!!"));
+
+	// 장전중 다시누르면 장전 취소
+	if(Weapon->bIsReloading)
+	{
+		Weapon->bIsReloading = false;
+		TPSAnimInstance->SetIsReloading(Weapon->bIsReloading);
+
+		GetWorldTimerManager().ClearTimer(ReloadTimer);
+		LOG_WARNING(TEXT("OnReloadingStart Cancel!!!"));
+	}
+	// 장전시작
+	else
+	{
+		Weapon->bIsReloading = true;
+		TPSAnimInstance->SetIsReloading(Weapon->bIsReloading);
+
+		GetWorldTimerManager().SetTimer(ReloadTimer, this, &ATPSCharacter::OnReloadingEnd, 2, false);
+		LOG_WARNING(TEXT("OnReloadingStart2!!!"));
+	}
+}
+
+void ATPSCharacter::OnReloadingEnd() 
+{
+	// 호출됐을때 장전중이었으면 탄창 최대로 채워주고 장전 액션 종료.
+	if (Weapon->bIsReloading)
+	{
+		Weapon->bIsReloading = false;
+		TPSAnimInstance->SetIsReloading(Weapon->bIsReloading);
+		Weapon->nCurrentBulletNum = Weapon->nMaxBulletNum;
+		LOG_WARNING(TEXT("OnReloadingEnd!!!"));
+	}
 }
 
 void ATPSCharacter::Aim()
