@@ -6,6 +6,7 @@
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 #include "Characters/TPSCharacter.h"
 #include "WeaponLineTrace.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 AWeapons::AWeapons()
@@ -99,25 +100,37 @@ void AWeapons::OnFire(ATPSCharacter* Character)
 			FVector CameraLocation;
 			FRotator CameraRotation;
 			GetActorEyesViewPoint(CameraLocation, CameraRotation);
-
-			FQuat rotator = FQuat(Character->GetControlRotation());
 			
 			FVector WorldLocation;
 			FVector WorldDirection;
+
 			int x, y;
 			Character->GetWorld()->GetFirstPlayerController()->GetViewportSize(x, y);
 			Character->GetWorld()->GetFirstPlayerController()->DeprojectScreenPositionToWorld(x * 0.5f, y * 0.5f, WorldLocation, WorldDirection);
 
 			MuzzleLocation = GetActorLocation() + FTransform(CameraRotation).TransformVector(SpawnOffset);
-			MuzzleRotation = Character->GetControlRotation(); //CameraRotation + FRotator(0.0f, 90.0f, 0.0f);
+			MuzzleRotation = GetActorRotation();
 
-			FVector location = MuzzleLocation;
-			FVector start = location;
-			FVector end = location + rotator.GetForwardVector() * 1000.f;
+			FCollisionQueryParams collision_params;
+			collision_params.AddIgnoredActor(Character);
 
-			//MuzzleRotation.Pitch += 10.0f; 
+			//  컨트롤러 기준에서 중심점 월드 좌표 얻고
+			FVector EndPoint;
+
+			FHitResult hit;
+			Character->GetWorld()->GetFirstPlayerController()->GetHitResultAtScreenPosition(FVector2D(x * 0.5f, y * 0.5f), ECC_Visibility, true, hit);
+			if (hit.GetActor() != NULL)
+			{
+				FVector TargetLocation = FVector(hit.Location.X, hit.Location.Y, hit.Location.Z);
+				EndPoint = TargetLocation;
+				LOG_WARNING(TEXT("Target Check!"));
+			}
+
+
+			// LineTrace로 쏴서, Hit 포인트 생기면 해당 End 위치로 크로스 헤어 조정해주기 ( 크로스헤어 위치는 계속해서 리니어하게 이동)
+
 			UWorld* World = GetWorld(); 
-			
+		
 			if (World) 
 			{ 
 				FActorSpawnParameters SpawnParams;
@@ -126,16 +139,15 @@ void AWeapons::OnFire(ATPSCharacter* Character)
 				AudioComponent->Play();
 
 				if (ParticleSystemComponent)
+				{
 					UGameplayStatics::SpawnEmitterAttached(ParticleSystemComponent->Template, Weapon, FName("Muzzle"));
-					//UGameplayStatics::SpawnEmitterAtLocation(World, ParticleSystemComponent->Template, MuzzleLocation);
-
+				}
 				AProjectile* Projectile = World->SpawnActor<AProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation, SpawnParams); 
-				if (Projectile) { 
-					
-					//FVector LaunchDirection = MuzzleRotation.Vector();
-					//Projectile->FireInDirection(LaunchDirection); 
-					Projectile->FireInDirection(WorldDirection); 
-					
+				if (Projectile) 
+				{
+					// 새로 찾은 월드 좌표에서 소켓 위치 기준으로 방향 다시 잡음
+					FVector FireDirection = (EndPoint - MuzzleLocation).GetSafeNormal();
+					Projectile->FireInDirection(FireDirection);
 				} 
 			}
 		}
@@ -143,7 +155,10 @@ void AWeapons::OnFire(ATPSCharacter* Character)
 		{
 			LOG_WARNING(TEXT("ProjectileClass=NULL"));
 		}
-		if (LineTrace)
+
+		bool bLinTraceTest = false;
+
+		if (LineTrace && bLinTraceTest)
 			LineTrace->OnFire(Character);
 
 		//// try and play a firing animation if specified

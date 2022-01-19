@@ -26,6 +26,9 @@ class TPS_API AProjectile : public AActor
 public:
 	AProjectile();
 
+	UPROPERTY(EditDefaultsOnly, Category = "FX")
+	UParticleSystemComponent* ParticleSystemComponent;
+
 	/** called when projectile hits something */
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);

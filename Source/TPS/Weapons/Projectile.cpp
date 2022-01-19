@@ -12,8 +12,6 @@ AProjectile::AProjectile()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-
-
 	// Use a sphere as a simple collision representation
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
 	CollisionComponent->InitSphereRadius(5.0f);
@@ -55,8 +53,20 @@ AProjectile::AProjectile()
 	ProjectileMovement->ProjectileGravityScale = 0.0f;
 
 	// Die after 10 seconds by default
-	InitialLifeSpan = 10.0f;
+	InitialLifeSpan = 1.0f;
 	//LOG_WARNING(TEXT("PROJECTILE CREATE!!"));
+
+	ParticleSystemComponent = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("ParticleSystem"));
+	ParticleSystemComponent->SetupAttachment(RootComponent);
+	ParticleSystemComponent->bAutoActivate = false;
+	ParticleSystemComponent->SetHiddenInGame(false);
+
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("ParticleSystem'/Game/InfinityBladeEffects/Effects/FX_Mobile/Fire/combat/P_Trap_Charge_Fire_01.P_Trap_Charge_Fire_01'"));
+
+	if (ParticleAsset.Succeeded())
+	{
+		ParticleSystemComponent->SetTemplate(ParticleAsset.Object);
+	}
 }
 
 void AProjectile::FireInDirection(const FVector& ShootDirection)
@@ -69,7 +79,10 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, U
 	// Only add impulse and destroy projectile if we hit a physics
 	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComponent != NULL)/* && OtherComponent->IsSimulatingPhysics()*/)
 	{
-		//OtherComponent->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
+		if(ParticleSystemComponent && ParticleSystemComponent->Template)
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ParticleSystemComponent->Template, GetActorLocation());
+		}
 
 		LOG_WARNING(TEXT("Hit!! Destroy"));
 		Destroy();
