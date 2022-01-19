@@ -66,6 +66,7 @@ ATPSCharacter::ATPSCharacter()
 	// Request Test
 	//static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_BP(TEXT("AnimBlueprint'/Game/AnimStarterPack/UE4ASP_HeroTPP_AnimBlueprint.UE4ASP_HeroTPP_AnimBlueprint_C'"));
 	// TPS ANIM
+
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_BP(TEXT("AnimBlueprint'/Game/AnimStarterPack/UE4_Mannequin/TPS_AnimBlueprint.TPS_AnimBlueprint_C'"));
 	
 	if (ANIM_BP.Succeeded())
@@ -114,6 +115,7 @@ void ATPSCharacter::WeaponEquip(E_WEAPON_TYPE e_CurrentWeaponType)
 				Weapon->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocket);
 				//LOG_WARNING(TEXT("Weapon Aattch!"));
 				Weapon->GetAttachParentSocketName();
+				Weapon->SetOwner(this);
 			}
 		}
 	}

@@ -73,6 +73,9 @@ public:
 	UFUNCTION()
 	void OnFire(ATPSCharacter* Character);
 
+	UFUNCTION()
+	void OnFire_AI(ATPSCharacter* Character);
+
 	float GetFireRate() { return FireRate; };
 	void SetFireRate(float setFireRate) { FireRate = setFireRate; };
 

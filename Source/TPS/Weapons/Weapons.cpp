@@ -89,6 +89,12 @@ void AWeapons::OnFire(ATPSCharacter* Character)
 {
 	//LOG_WARNING(TEXT("Weapon Fire!!!"));
 	// try and fire a projectile
+
+	if(Character->IsPlayerControlled() == false)
+	{
+		OnFire_AI(Character);
+		return;
+	}
 	
 	// 현재 총알이남았고, 재장전 아닐때~
 	if ( nCurrentBulletNum > 0 && !bIsReloading )
@@ -171,6 +177,39 @@ void AWeapons::OnFire(ATPSCharacter* Character)
 		//		AnimInstance->Montage_Play(FireAnimation, 1.f);
 		//	}
 		//}
+		nCurrentBulletNum--;
+	}
+}
+
+void AWeapons::OnFire_AI(ATPSCharacter* Character)
+{
+	if(nCurrentBulletNum > 0 && bIsReloading == false)
+	{
+		FRotator CharacterRotation = Character->GetActorRotation();
+
+		FVector CameraLocation;
+		FRotator CameraRotation;
+		GetActorEyesViewPoint(CameraLocation, CameraRotation);
+
+		MuzzleRotation = CharacterRotation;
+		MuzzleLocation = GetActorLocation() + CameraRotation.RotateVector(SpawnOffset);
+
+		UWorld* World = GetWorld();
+
+		if (World)
+		{
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.Owner = this;
+			SpawnParams.Instigator = GetInstigator();
+			AudioComponent->Play();
+
+			if (ParticleSystemComponent)
+			{
+				UGameplayStatics::SpawnEmitterAttached(ParticleSystemComponent->Template, Weapon, FName("Muzzle"));
+			}
+			AProjectile* Projectile = World->SpawnActor<AProjectile>(ProjectileClass, MuzzleLocation, MuzzleRotation, SpawnParams);
+		}
+
 		nCurrentBulletNum--;
 	}
 }
