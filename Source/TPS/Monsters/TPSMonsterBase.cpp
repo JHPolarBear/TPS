@@ -23,13 +23,6 @@ ATPSMonsterBase::ATPSMonsterBase()
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 480.f, 0.f);
-
-	// Set Anim Blueprint class
-	static ConstructorHelpers::FClassFinder<UAnimInstance> _ANIM(TEXT("/Game/AnimStarterPack/UE4ASP_HeroTPP_AnimBlueprint.UE4ASP_HeroTPP_AnimBlueprint_C"));
-	if (_ANIM.Succeeded())
-	{
-		GetMesh()->SetAnimInstanceClass(_ANIM.Class);
-	}
 }
 
 void ATPSMonsterBase::BeginPlay()
@@ -53,6 +46,16 @@ void ATPSMonsterBase::AimTarget(FVector TargetLotation)
 
 void ATPSMonsterBase::OnFire()
 {
+	if (Weapon->nCurrentBulletNum <= 0 && Weapon->bIsReloading == false)
+	{
+		OnReloadingStart();
+		return;
+	}
+	else if(Weapon->bIsReloading)
+	{
+		return;
+	}
+
 	if(GetIsFiring() == false)
 	{
 		LOG_WARNING(TEXT("MonsterBase On Fire!!!"));
