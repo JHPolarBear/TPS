@@ -179,6 +179,8 @@ void AWeapons::OnFire(ATPSCharacter* Character)
 		//}
 		nCurrentBulletNum--;
 	}
+
+	OnWeaponStateChanged.Broadcast();
 }
 
 void AWeapons::OnFire_AI(ATPSCharacter* Character)

@@ -13,6 +13,7 @@ ARifle::ARifle()
 	nMaxBulletNum = 30;
 	nCurrentBulletNum = nMaxBulletNum;
 	FireRate = 0.2f;
+	ThumbnailPath = TEXT("Texture2D'/Game/Textures/ak47.ak47'");
 }
 
 // Called when the game starts or when spawned

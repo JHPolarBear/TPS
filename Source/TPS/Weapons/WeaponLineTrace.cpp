@@ -18,7 +18,7 @@ void UWeaponLineTrace::OnFire( ATPSCharacter* Character )
 	Character->GetWorld()->GetFirstPlayerController()->DeprojectScreenPositionToWorld(x*0.5f,y*0.5f,WorldLocation,WorldDirection);
 
 	FQuat rotator = FQuat(Character->GetControlRotation());
-	FVector MuzzleLocation = Character->Weapon->GetMuzzleLocation(); // + rotator.RotateVector(Character->Weapon->SpawnOffset);
+	FVector MuzzleLocation = Character->GetWeapon()->GetMuzzleLocation(); // + rotator.RotateVector(Character->Weapon->SpawnOffset);
 
 	FVector start = MuzzleLocation;
 	FVector end = WorldLocation;;//MuzzleLocation + rotator.GetForwardVector() * 10000.f;

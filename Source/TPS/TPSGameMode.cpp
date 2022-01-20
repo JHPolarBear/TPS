@@ -7,16 +7,14 @@
 #include "Characters/TPSHUD.h"
 
 ATPSGameMode::ATPSGameMode()
+	: Super()
 {
-	// set default pawn class to our Blueprinted character
-	//static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/ThirdPersonCPP/Blueprints/ThirdPersonCharacter"));
-
+	// 전용 플레이어 스테이트 사용
+	DefaultPawnClass = ATPSCharacter::StaticClass();
 	// use our custom HUD class
 	HUDClass = ATPSHUD::StaticClass();
-
-	DefaultPawnClass = ATPSCharacter::StaticClass();
 	PlayerControllerClass = ATPSPlayerController::StaticClass();
-
+	PlayerStateClass = ATPSPlayerState::StaticClass();
 
 	LOG_WARNING(TEXT("Game Mode Created"));
 }

@@ -3,6 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Weapons/Weapons.h"
+#include "TPSAnimInstance.h"
+#include "Characters/TPSPlayerController.h"
+#include "Characters/TPSPlayerState.h"
 
 enum class E_CONTROL_MODE
 {

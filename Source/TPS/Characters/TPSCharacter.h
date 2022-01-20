@@ -2,12 +2,9 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "GameFramework/Character.h"
-#include "CommonDefines.h"
-#include "Weapons/Weapons.h"
-#include "TPSAnimInstance.h"
 #include "CharacterDefines.h"
+#include "CommonDefines.h"
+#include "GameFramework/Character.h"
 #include "TPSCharacter.generated.h"
 
 UCLASS(config=Game)
@@ -33,8 +30,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
 
-	UPROPERTY(VisibleAnywhere)
-	class AWeapons* Weapon;
+	AWeapons* GetWeapon() { return Weapon; };
 
 	float FireDeltaTime;
 
@@ -48,23 +44,25 @@ public:
 	FORCEINLINE bool GetIsBattleMode() const { return IsBattleMode; }
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Anim, meta = (AllowPrivateAccess = "true"))
-	int nMaxHealth;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Anim, meta = (AllowPrivateAccess = "true"))
-	int nCurrentHealth;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Anim, meta = (AllowPrivateAccess = "true"))
 	bool IsDeath;
 	FORCEINLINE bool GetIsDeath() const { return IsDeath; }
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Anim, meta = (AllowPrivateAccess = "true"))
 	bool IsFiring;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Monster)
+	bool IsMonster;
+	
 	void SetIsFiring(bool setFiring);
 
 	FORCEINLINE bool GetIsFiring() const { return IsFiring; }
 
+	ATPSPlayerState* GetTPSPlayerState() {	return TPSPlayerState; }
+
 protected:
+
+	UPROPERTY(VisibleAnywhere)
+	class AWeapons* Weapon;
 
 	UFUNCTION()
 	virtual void OnFire();
@@ -121,6 +119,12 @@ protected:
 	FTimerHandle ReloadTimer;
 	void OnReloadingStart();
 	void OnReloadingEnd();
+
+	UPROPERTY()
+	class ATPSPlayerState* TPSPlayerState;
+
+	UPROPERTY()
+	class ATPSPlayerController* TPSPlayerController;
 
 protected:
 	// APawn interface

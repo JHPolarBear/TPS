@@ -16,10 +16,20 @@ class ATPSPlayerController : public APlayerController
 	
 public:
 
+	ATPSPlayerController();
+
 	virtual void PostInitializeComponents() override;
 	virtual void OnPossess(APawn* aPawn) override;
 
+	UPROPERTY()
+	class UTPSUserWidget* TPSWidget;
+
+	void SettingWidget();
+
 protected:
 	virtual void BeginPlay() override;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = UI)
+	TSubclassOf<class UTPSUserWidget> TPSWidgetClass;
 
 };

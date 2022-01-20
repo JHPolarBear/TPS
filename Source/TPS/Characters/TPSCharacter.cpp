@@ -79,10 +79,10 @@ ATPSCharacter::ATPSCharacter()
 	ArmLegthSpeed = 25.0f;
 
 	IsDeath = false;
+	IsMonster = false;
 
-	nMaxHealth = 100;
-	nCurrentHealth = nMaxHealth;
-
+	TPSPlayerController = NULL;
+	TPSPlayerState = NULL;
 }
 void ATPSCharacter::WeaponEquip(E_WEAPON_TYPE e_CurrentWeaponType)
 {
@@ -116,6 +116,8 @@ void ATPSCharacter::WeaponEquip(E_WEAPON_TYPE e_CurrentWeaponType)
 				//LOG_WARNING(TEXT("Weapon Aattch!"));
 				Weapon->GetAttachParentSocketName();
 				Weapon->SetOwner(this);
+
+				Weapon->OnWeaponStateChanged.Broadcast();
 			}
 		}
 	}
@@ -174,16 +176,34 @@ void ATPSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-
 	// 소켓에 총 붙이기
 	WeaponEquip(E_RIFLE);
-
 
 	TPSAnimInstance = Cast<UTPSAnimInstance>(GetMesh()->GetAnimInstance());
 
 	SetControlMode(E_CONTROL_MODE::NORMAL);
 
+	if(!IsMonster)
+	{
+		LOG_WARNING(TEXT("Character Controller Setting start"));
 
+		// 컨트롤러 셋팅
+		TPSPlayerController = Cast<ATPSPlayerController>(GetController());
+		ASSERT_CHECK(TPSPlayerController != nullptr);
+		if(TPSPlayerController)
+		{
+			// 플레이어 스테이트 셋팅
+			TPSPlayerState = TPSPlayerController->GetPlayerState<ATPSPlayerState>();
+			ASSERT_CHECK(TPSPlayerState != nullptr);
+
+			TPSPlayerState->SetDefaultWalkSpeed(GetCharacterMovement()->MaxWalkSpeed);
+			TPSPlayerState->SetRunMultiplier(2.0f);
+
+			TPSPlayerController->SettingWidget();
+		}
+
+		LOG_WARNING(TEXT("Character Controller Setting end"));
+	}
 }
 
 void ATPSCharacter::Tick(float DeltaTime)

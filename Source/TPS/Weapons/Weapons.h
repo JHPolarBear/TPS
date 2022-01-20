@@ -9,6 +9,9 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Weapons.generated.h"
 
+// delegate about changing weapon 
+DECLARE_MULTICAST_DELEGATE(FOnWeaponStateChangedDelegate);
+
 UCLASS(config = Game)
 class TPS_API AWeapons : public AActor
 {
@@ -78,6 +81,14 @@ public:
 
 	float GetFireRate() { return FireRate; };
 	void SetFireRate(float setFireRate) { FireRate = setFireRate; };
+
+	// Weapon Thumbnail file name
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Data")
+	FString ThumbnailPath;
+
+	FString GetThumbnailPath() { return ThumbnailPath; };
+
+	FOnWeaponStateChangedDelegate OnWeaponStateChanged;
 
 protected:
 
