@@ -190,6 +190,7 @@ void ATPSCharacter::BeginPlay()
 		// 컨트롤러 셋팅
 		TPSPlayerController = Cast<ATPSPlayerController>(GetController());
 		ASSERT_CHECK(TPSPlayerController != nullptr);
+
 		if(TPSPlayerController)
 		{
 			// 플레이어 스테이트 셋팅
@@ -200,6 +201,8 @@ void ATPSCharacter::BeginPlay()
 			TPSPlayerState->SetRunMultiplier(2.0f);
 
 			TPSPlayerController->SettingWidget();
+
+			TPSPlayerState->SetMaxBulletCount(Weapon->nMaxBulletNum);
 		}
 
 		LOG_WARNING(TEXT("Character Controller Setting end"));
@@ -223,6 +226,7 @@ void ATPSCharacter::Tick(float DeltaTime)
 			if (Weapon)
 			{
 				Weapon->OnFire(this);
+				if(TPSPlayerState) TPSPlayerState->SetBulletCount(Weapon->nCurrentBulletNum);
 			}
 			FireDeltaTime = 0.0f;
 			// 단발 총(권총)인 경우에는 연발 안되게처리
@@ -317,6 +321,7 @@ void ATPSCharacter::OnReloadingEnd()
 		Weapon->bIsReloading = false;
 		TPSAnimInstance->SetIsReloading(Weapon->bIsReloading);
 		Weapon->nCurrentBulletNum = Weapon->nMaxBulletNum;
+		if(TPSPlayerState) TPSPlayerState->SetBulletCount(Weapon->nCurrentBulletNum);
 		LOG_WARNING(TEXT("OnReloadingEnd!!!"));
 	}
 }

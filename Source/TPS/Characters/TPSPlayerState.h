@@ -28,6 +28,12 @@ public:
 	float GetCurrentAP() const;
 	float GetAPRatio();
 
+	int GetMaxBulletCount();
+	int GetBulletCount();
+
+	void SetMaxBulletCount(int _MaxBullet);
+	void SetBulletCount(int _Bullet);
+
 	void DecreaseAP();
 	void IncreaseAP();
 
@@ -67,4 +73,12 @@ private:
 	/** Dash parameter */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Status, meta = (AllowPrivateAccess = true))
 		float RunMultiplier;
+
+	/** BulletCount parameter */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Status, meta = (AllowPrivateAccess = true))
+		int BulletCount;
+
+	/** MaxBulletCount parameter */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Status, meta = (AllowPrivateAccess = true))
+		int MaxBulletCount;
 };

@@ -64,7 +64,8 @@ void UTPSUserWidget::BindPlayerState(class ATPSPlayerState* NewPlayerState)
 void UTPSUserWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-
+	
+	Projectile = Cast<UTextBlock>(GetWidgetFromName(TEXT("Projectile_Slot")));
 	PlayerName = Cast<UTextBlock>(GetWidgetFromName(TEXT("PlayerName_Slot")));
 	HPBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("HP_Bar")));
 	APBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("AP_Bar")));
@@ -73,6 +74,9 @@ void UTPSUserWidget::NativeConstruct()
 
 void UTPSUserWidget::UpdatePlayerState()
 {
+	const FString ProjectileString = FString::Printf(TEXT("%d / %d"), CurrentPlayerState->GetBulletCount(), CurrentPlayerState->GetMaxBulletCount());
+
+	Projectile->SetText(FText::FromString(ProjectileString));
 	PlayerName->SetText(FText::FromString(CurrentPlayerState->GetPlayerName()));
 
 	HPBar->SetPercent(CurrentPlayerState->GetHPRatio());

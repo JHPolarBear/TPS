@@ -69,6 +69,27 @@ void ATPSPlayerState::IncreaseAP()
 	OnPlayerStateChanged.Broadcast();
 }
 
+int ATPSPlayerState::GetMaxBulletCount()
+{
+	return MaxBulletCount;
+}
+
+int ATPSPlayerState::GetBulletCount()
+{
+	return BulletCount;
+}
+void ATPSPlayerState::SetMaxBulletCount(int _MaxBullet)
+{
+	MaxBulletCount = _MaxBullet;
+	OnPlayerStateChanged.Broadcast();
+}
+
+void ATPSPlayerState::SetBulletCount(int _Bullet)
+{
+	BulletCount = _Bullet;
+	OnPlayerStateChanged.Broadcast();
+}
+
 void ATPSPlayerState::SetRunMultiplier(float _val)
 {
 	RunMultiplier = _val;
@@ -98,4 +119,8 @@ void ATPSPlayerState::Init()
 	CurrentAP = 100;
 
 	DecreaseAmountAP = 0.5;
+	
+	MaxBulletCount = 0;
+	BulletCount = 0;
+
 }

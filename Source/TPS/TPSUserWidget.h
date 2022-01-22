@@ -34,6 +34,10 @@ private:
 
 	/** Player ID(NickName) */
 	UPROPERTY()
+	class UTextBlock* Projectile;
+
+	/** Player ID(NickName) */
+	UPROPERTY()
 	class UTextBlock* PlayerName;
 
 	/** Player remain HP */
