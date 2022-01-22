@@ -19,6 +19,8 @@ public:
 
 	virtual void BeginPlay() override;
 
+	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
 	float GetRandomPatrolRadiusMax()	{return RandomPatrolRadiusMax;}
 
 public:
@@ -27,6 +29,15 @@ public:
 	virtual void OnFire();
 
 	virtual void OnFireStop();
+
+	void OnDead();
+
+	void OnDeadAction();
+
+	// 사망 시 동작하는 타이머
+	FTimerHandle DeadActionHandler;
+	// 사망 후 잔여 시간
+	float DeadActionTime; 
 
 private:
 	

@@ -7,6 +7,7 @@
 #include "TPSMonsterBase_StatComponent.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(OnStatChangedDelegate);
+DECLARE_MULTICAST_DELEGATE(OnHPIsZeroDelegate);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class TPS_API UTPSMonsterBase_StatComponent : public UActorComponent
@@ -24,8 +25,11 @@ protected:
 public:	
 	void SetMaxHP(float _val);
 	float GetMaxHP() const;
+	void SetCurrentHP(float _newHP);
 	float GetCurrentHP() const;
 	float GetHPRatio();
+
+	void  SetDamage(float _damage);
 
 	void SetMaxAP(float _val);
 	float GetMaxAP() const;
@@ -44,6 +48,7 @@ public:
 	void Init();
 
 	OnStatChangedDelegate OnStatChanged;
+	OnHPIsZeroDelegate OnHPIsZero;
 
 private:
 	/** HP: Character's life point  */

@@ -6,6 +6,8 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
 
+#include "Monsters/TPSMonsterBase.h"
+
 // Sets default values
 AProjectile::AProjectile()
 {
@@ -83,8 +85,15 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, U
 		{
 			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ParticleSystemComponent->Template, GetActorLocation());
 		}
-
-		LOG_WARNING(TEXT("Hit!! Destroy"));
-		Destroy();
 	}
+
+	auto Monster = Cast<ATPSMonsterBase>(OtherActor);
+	if(Monster)
+	{
+		FDamageEvent DamageEvent;
+		Monster->TakeDamage(10, DamageEvent, nullptr, this);
+	}
+
+	LOG_WARNING(TEXT("Hit!! Destroy"));
+	Destroy();
 }

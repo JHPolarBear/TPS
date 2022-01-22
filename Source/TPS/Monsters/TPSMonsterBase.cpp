@@ -43,7 +43,10 @@ ATPSMonsterBase::ATPSMonsterBase()
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 480.f, 0.f);
+	
 	IsMonster = true;
+
+	DeadActionTime = 3.0f;
 }
 
 void ATPSMonsterBase::BeginPlay()
@@ -62,7 +65,23 @@ void ATPSMonsterBase::BeginPlay()
 	if(MonsterStatWidget)
 		MonsterStatWidget->BindStatComponent(MonsterStat);
 
+	if(MonsterStat)
+	{
+		MonsterStat->OnHPIsZero.AddLambda([this]()->void{
+			OnDead();
+		});
+	}
+
 	GetCharacterMovement()->MaxWalkSpeed /= 0.7;
+}
+
+float ATPSMonsterBase::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float FinalDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+
+	MonsterStat->SetDamage(FinalDamage);
+
+	return FinalDamage;
 }
 
 void ATPSMonsterBase::AimTarget(FVector TargetLocation)
@@ -100,4 +119,41 @@ void ATPSMonsterBase::OnFireStop()
 	LOG_WARNING(TEXT("MonsterBase On Fire Stop!!!"));
 
 	Super::OnFireStop();
+}
+
+void ATPSMonsterBase::OnDead()
+{
+	if(GetController())
+	{
+		// 향후에는 모든 액션을 멈추는 기능으로 통합할 것
+		OnFireStop();
+
+		// Start ai behavior tree
+		ATPSAIController_MonsterBase* TPSAIController = Cast<ATPSAIController_MonsterBase>(GetController());
+		if (TPSAIController)
+		{
+			TPSAIController->StopAI();
+		}
+
+		GetController()->StopMovement();
+		GetController()->UnPossess();
+
+		// 더 이상 충돌을 일으키지 않도록 (시체 위를 지나갈수 있도록 등)
+		SetActorEnableCollision(false);
+
+		SetCanBeDamaged(false);
+
+		// 관련 위젯 비활성화
+		StatWidget->SetHiddenInGame(true);
+
+		GetWorld()->GetTimerManager().SetTimer(DeadActionHandler, this, &ATPSMonsterBase::OnDeadAction, DeadActionTime, false);
+	}
+}
+
+void ATPSMonsterBase::OnDeadAction()
+{
+	if(Weapon)
+		Weapon->Destroy();
+
+	Destroy();
 }

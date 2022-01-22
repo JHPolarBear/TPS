@@ -10,6 +10,8 @@ UTPSMonsterBase_StatComponent::UTPSMonsterBase_StatComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
 
+	Init();
+
 	// ...
 }
 
@@ -33,6 +35,20 @@ float UTPSMonsterBase_StatComponent::GetMaxHP() const
 	return MaxHP;
 }
 
+void UTPSMonsterBase_StatComponent::SetCurrentHP(float _newHP)
+{
+	CurrentHP = _newHP;
+
+	// Broadcast
+	OnStatChanged.Broadcast();
+
+	if (CurrentHP < KINDA_SMALL_NUMBER)
+	{
+		CurrentHP = 0.0f;
+		OnHPIsZero.Broadcast();
+	}
+}
+
 float UTPSMonsterBase_StatComponent::GetCurrentHP() const
 {
 	return CurrentHP;
@@ -44,6 +60,11 @@ float UTPSMonsterBase_StatComponent::GetHPRatio()
 		return 0;
 	else
 		return CurrentHP / MaxHP;
+}
+
+void UTPSMonsterBase_StatComponent::SetDamage(float _damage)
+{
+	SetCurrentHP(FMath::Clamp(CurrentHP - _damage, 0.f, MaxHP));
 }
 
 void UTPSMonsterBase_StatComponent::SetMaxAP(float _val)
