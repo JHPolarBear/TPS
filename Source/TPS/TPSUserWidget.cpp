@@ -65,8 +65,8 @@ void UTPSUserWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 	
-	Projectile = Cast<UTextBlock>(GetWidgetFromName(TEXT("Projectile_Slot")));
-	PlayerName = Cast<UTextBlock>(GetWidgetFromName(TEXT("PlayerName_Slot")));
+	Projectile = Cast<UTextBlock>(GetWidgetFromName(TEXT("ProjectileSlot")));
+	PlayerName = Cast<UTextBlock>(GetWidgetFromName(TEXT("PlayerNameSlot")));
 	HPBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("HP_Bar")));
 	APBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("AP_Bar")));
 	ThumbnailImage = Cast<UImage>(GetWidgetFromName(TEXT("WeaponThumbnail_IMG")));

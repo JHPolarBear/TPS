@@ -2,8 +2,13 @@
 
 
 #include "Monsters/TPSMonsterBase.h"
+
+#include "Components/WidgetComponent.h"
+
 #include "Monsters/TPSAIController_MonsterBase.h"
 #include "Characters/TPSCharacter.h"
+#include "Monsters/TPSMonsterBase_StatComponent.h"
+#include "Monsters/TPSMonsterBase_StatWidget.h"
 
 #include "Kismet/KismetMathLibrary.h"
 
@@ -12,6 +17,21 @@ ATPSMonsterBase::ATPSMonsterBase()
 	// Disable Camera component's tick
 	GetCameraBoom()->Deactivate();
 	GetFollowCamera()->Deactivate();
+
+	MonsterStat = CreateDefaultSubobject<UTPSMonsterBase_StatComponent>(TEXT("StatComponent"));
+
+	StatWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("StatWidget"));
+	static ConstructorHelpers::FClassFinder<UUserWidget> UI_STATWIDGET(TEXT("WidgetBlueprint'/Game/UI/Characters/BP_MonsterBase_StatWidget.BP_MonsterBase_StatWidget_C'"));
+	if(UI_STATWIDGET.Succeeded())
+	{
+		StatWidget->SetWidgetClass(UI_STATWIDGET.Class);
+		StatWidget->SetDrawSize(FVector2D(110.f, 10.f));
+	}
+
+	StatWidget->SetupAttachment(GetMesh());
+	StatWidget->SetRelativeLocation(FVector(0.f, 0.f, 205.f));
+	StatWidget->SetWidgetSpace(EWidgetSpace::Screen);
+
 
 	// Set AI Controller as default
 	AIControllerClass = ATPSAIController_MonsterBase::StaticClass();
@@ -36,11 +56,18 @@ void ATPSMonsterBase::BeginPlay()
 	{
 		TPSAIController->RunAI();
 	}
+
+	// bind statcomponent to stat widget
+	UTPSMonsterBase_StatWidget* MonsterStatWidget = Cast<UTPSMonsterBase_StatWidget>(StatWidget->GetUserWidgetObject());
+	if(MonsterStatWidget)
+		MonsterStatWidget->BindStatComponent(MonsterStat);
+
+	GetCharacterMovement()->MaxWalkSpeed /= 0.7;
 }
 
-void ATPSMonsterBase::AimTarget(FVector TargetLotation)
+void ATPSMonsterBase::AimTarget(FVector TargetLocation)
 {
-	FRotator LookAt = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetLotation);
+	FRotator LookAt = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetLocation);
 
 	SetActorRelativeRotation(FQuat(LookAt));
 }

@@ -22,7 +22,7 @@ public:
 	float GetRandomPatrolRadiusMax()	{return RandomPatrolRadiusMax;}
 
 public:
-	void AimTarget(FVector TargetLotation);
+	void AimTarget(FVector TargetLocation);
 
 	virtual void OnFire();
 
@@ -32,5 +32,11 @@ private:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI, meta = (AllowPrivateAccess = true) )
 	float RandomPatrolRadiusMax = 1000.f;
+
+	UPROPERTY(VisibleAnywhere, Category = Stat)
+	class UTPSMonsterBase_StatComponent* MonsterStat;
+
+	UPROPERTY(VisibleAnywhere, Category = Stat)
+	class UWidgetComponent* StatWidget;
 	
 };
