@@ -25,8 +25,7 @@ AWeapons::AWeapons()
 	MuzzleLocation = FVector::ZeroVector;
 	MuzzleRotation = FRotator::ZeroRotator;
 
-	LineTrace = NewObject<UWeaponLineTrace>();
-	
+	LineTrace = NewObject<UWeaponLineTrace>();	
 }
 
 void AWeapons::LoadSkeletalMeshType(E_WEAPON_TYPE e_WeaponType)
@@ -179,8 +178,6 @@ void AWeapons::OnFire(ATPSCharacter* Character)
 		//}
 		nCurrentBulletNum--;
 	}
-
-	OnWeaponStateChanged.Broadcast();
 }
 
 void AWeapons::OnFire_AI(ATPSCharacter* Character)

@@ -8,7 +8,7 @@ UTPSAnimInstance::UTPSAnimInstance()
 	Velocity = 0.0f;
 	Direction = 0.0f;
 
-	IsAttack = false;
+	IsFire = false;
 	IsReloading = false;
 
 	State = (int) E_CONTROL_MODE::NORMAL;
@@ -24,4 +24,8 @@ void UTPSAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		Velocity = Pawn->GetVelocity().Size();
 		Direction = CalculateDirection(Pawn->GetVelocity(), Pawn->GetActorRotation());
 	}
+}
+void UTPSAnimInstance::SetDeathState() 
+{
+	State = (int)E_CONTROL_MODE::DEATH;
 }

@@ -87,13 +87,21 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, U
 		}
 	}
 
+	auto Character = Cast<ATPSCharacter>(OtherActor);
+	if (Character && !Character->IsMonster)
+	{
+		FDamageEvent DamageEvent;
+		Character->TakeDamage(1, DamageEvent, nullptr, this);
+		LOG_WARNING(TEXT("Hit!! Player"));
+	}
+
 	auto Monster = Cast<ATPSMonsterBase>(OtherActor);
 	if(Monster)
 	{
 		FDamageEvent DamageEvent;
 		Monster->TakeDamage(10, DamageEvent, nullptr, this);
+		LOG_WARNING(TEXT("Hit!! Monster"));
 	}
 
-	LOG_WARNING(TEXT("Hit!! Destroy"));
 	Destroy();
 }

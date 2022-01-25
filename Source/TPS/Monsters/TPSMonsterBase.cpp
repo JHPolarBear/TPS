@@ -46,7 +46,7 @@ ATPSMonsterBase::ATPSMonsterBase()
 	
 	IsMonster = true;
 
-	DeadActionTime = 3.0f;
+	DeadActionTime = 2.0f;
 }
 
 void ATPSMonsterBase::BeginPlay()
@@ -80,6 +80,8 @@ float ATPSMonsterBase::TakeDamage(float Damage, struct FDamageEvent const& Damag
 	float FinalDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 
 	MonsterStat->SetDamage(FinalDamage);
+
+	//LOG_WARNING(TEXT("Take Damage!! Monster"));
 
 	return FinalDamage;
 }
@@ -125,6 +127,8 @@ void ATPSMonsterBase::OnDead()
 {
 	if(GetController())
 	{
+		StartDeathAction();
+
 		// 향후에는 모든 액션을 멈추는 기능으로 통합할 것
 		OnFireStop();
 

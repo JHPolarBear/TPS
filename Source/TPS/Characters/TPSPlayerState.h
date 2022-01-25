@@ -20,6 +20,7 @@ public:
 
 	void SetMaxHP(float _val);
 	float GetMaxHP() const;
+	void SetCurrentHP(float _val);
 	float GetCurrentHP() const;
 	float GetHPRatio();
 
@@ -42,6 +43,8 @@ public:
 
 	void SetDefaultWalkSpeed(float _val);
 	float GetDefaultWalkSpeed();
+
+	void SetDamage(float _damage);
 
 	void Init();
 

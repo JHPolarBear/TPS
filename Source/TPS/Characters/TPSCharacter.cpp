@@ -169,8 +169,14 @@ void ATPSCharacter::SetIsFiring(bool setFiring)
 {
 	IsFiring = setFiring;
 	
-	if (TPSAnimInstance != nullptr)
-		TPSAnimInstance->SetIsAttack(IsFiring);
+	if (TPSAnimInstance != nullptr) 
+	{	
+		if (TPSAnimInstance->GetIsFireCheck() != IsFiring) 
+		{
+			TPSAnimInstance->SetIsFire(IsFiring);
+			LOG_WARNING(TEXT("Attack!!!"));
+		}
+	}
 }
 void ATPSCharacter::BeginPlay()
 {
@@ -203,6 +209,7 @@ void ATPSCharacter::BeginPlay()
 			TPSPlayerController->SettingWidget();
 
 			TPSPlayerState->SetMaxBulletCount(Weapon->nMaxBulletNum);
+			TPSPlayerState->SetBulletCount(Weapon->nCurrentBulletNum);
 		}
 
 		LOG_WARNING(TEXT("Character Controller Setting end"));
@@ -399,5 +406,35 @@ void ATPSCharacter::MoveRight(float Value)
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
+	}
+}
+
+
+float ATPSCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float FinalDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+	
+	if (!IsMonster)
+	{
+		if (TPSPlayerState) 
+			TPSPlayerState->SetDamage(FinalDamage);
+
+		if (TPSPlayerState->GetCurrentHP() <= 0)
+		{
+			StartDeathAction();
+		}
+
+		LOG_WARNING(TEXT("Take Damage!! Player"));
+	}
+
+	return FinalDamage;
+}
+
+void ATPSCharacter::StartDeathAction()
+{
+	if (TPSAnimInstance != nullptr)
+	{
+		IsDeath = true;
+		TPSAnimInstance->SetDeathState();
 	}
 }

@@ -32,7 +32,7 @@ private:
 		int State;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Pawn, meta = (AllowPrivateAccess = "true"))
-		bool IsAttack;
+		bool IsFire;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pawn, meta = (AllowPrivateAccess = "true"))
 		bool IsReloading;
@@ -40,9 +40,12 @@ private:
 public:
 	UTPSAnimInstance();
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
-
+	
+	void SetDeathState();
 	void SetState(int set_State) { State = set_State; };
-	void SetIsAttack(bool set_Attack) { IsAttack = set_Attack; };
+
+	bool GetIsFireCheck() { return IsFire; };
+	void SetIsFire(bool set_Fire) { IsFire = set_Fire; };
 	void SetAimVertical(float vertical) { AimVertical = vertical; };
 	void SetAimHorizontal(float horizontal) { AimHorizontal = horizontal; };
 	void SetIsReloading(bool set_Reloading) { IsReloading = set_Reloading; };

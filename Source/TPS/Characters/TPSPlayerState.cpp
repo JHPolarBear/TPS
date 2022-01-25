@@ -12,6 +12,13 @@ ATPSPlayerState::ATPSPlayerState()
 void ATPSPlayerState::SetMaxHP(float _val)
 {
 	MaxHP = _val;
+	OnPlayerStateChanged.Broadcast();
+}
+
+void ATPSPlayerState::SetCurrentHP(float _val)
+{
+	CurrentHP = _val;
+	OnPlayerStateChanged.Broadcast();
 }
 
 float ATPSPlayerState::GetMaxHP() const
@@ -67,6 +74,11 @@ void ATPSPlayerState::IncreaseAP()
 	CurrentAP += DecreaseAmountAP;
 	CurrentAP = FMath::Clamp(CurrentAP, 0.f, MaxAP);
 	OnPlayerStateChanged.Broadcast();
+}
+
+void ATPSPlayerState::SetDamage(float _damage)
+{
+	SetCurrentHP(FMath::Clamp(CurrentHP - _damage, 0.f, MaxHP));
 }
 
 int ATPSPlayerState::GetMaxBulletCount()

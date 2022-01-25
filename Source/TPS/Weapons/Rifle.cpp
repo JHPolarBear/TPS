@@ -21,7 +21,6 @@ void ARifle::BeginPlay()
 {
 	Super::BeginPlay();
 	SetFireRate(0.1f);
-	
 }
 
 // Called every frame

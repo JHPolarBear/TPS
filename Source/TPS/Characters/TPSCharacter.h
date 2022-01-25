@@ -52,12 +52,16 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Monster)
 	bool IsMonster;
-	
+
+	void StartDeathAction();
+
 	void SetIsFiring(bool setFiring);
 
 	FORCEINLINE bool GetIsFiring() const { return IsFiring; }
 
-	ATPSPlayerState* GetTPSPlayerState() {	return TPSPlayerState; }
+	ATPSPlayerState* GetTPSPlayerState() { return TPSPlayerState; }
+
+	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 protected:
 
