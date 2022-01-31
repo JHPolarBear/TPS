@@ -116,7 +116,7 @@ void ATPSMonsterBase::OnFire()
 
 void ATPSMonsterBase::OnFireStop()
 {
-	LOG_WARNING(TEXT("MonsterBase On Fire Stop!!!"));
+	//LOG_WARNING(TEXT("MonsterBase On Fire Stop!!!"));
 
 	Super::OnFireStop();
 }

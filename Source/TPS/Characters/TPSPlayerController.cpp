@@ -22,7 +22,6 @@ ATPSPlayerController::ATPSPlayerController()
 void ATPSPlayerController::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-
 }
 
 void ATPSPlayerController::OnPossess(APawn* aPawn)
