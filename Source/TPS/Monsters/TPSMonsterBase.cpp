@@ -42,7 +42,7 @@ ATPSMonsterBase::ATPSMonsterBase()
 	bUseControllerRotationYaw = false;
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->RotationRate = FRotator(0.f, 480.f, 0.f);
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 240.f, 0.f);
 	
 	IsMonster = true;
 

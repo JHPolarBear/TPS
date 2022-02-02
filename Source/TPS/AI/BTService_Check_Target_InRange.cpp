@@ -9,6 +9,7 @@
 
 #include "Monsters/TPSAIController_MonsterBase.h"
 #include "Characters/TPSCharacter.h"
+#include "Monsters/TPSMonsterBase.h"
 
 UBTService_Check_Target_InRange::UBTService_Check_Target_InRange()
 {
@@ -31,8 +32,6 @@ void UBTService_Check_Target_InRange::TickNode(UBehaviorTreeComponent& OwnerComp
 	ATPSCharacter* Player = Cast<ATPSCharacter>(OwnerComp.GetBlackboardComponent()->GetValueAsObject(ATPSAIController_MonsterBase::TargetKey));
 	if(Player)
 	{
-		
-
 		if (ControllingPawn->GetDistanceTo(Player) <= FireRangeRadius)
 		{
 			IsInRange = true;
