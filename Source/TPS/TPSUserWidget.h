@@ -19,6 +19,8 @@ public:
 
 	bool BindWeapon(class AWeapons* weapon);
 
+	void BindGameState(class ATPSGameState* NewGameState);
+
 	void UpdateWeaponState();
 
 	virtual void NativeConstruct() override;
@@ -27,10 +29,15 @@ protected:
 
 	void UpdatePlayerState();
 
+	void UpdateTimeState();
+
 private:
 
 	/** 현재 플레이어의 플레이어 스테이트 - 플레이어 스테이트에 선언된 캐릭터의 능력치를 UI에 바인딩하는데 사용   */
 	TWeakObjectPtr<class ATPSPlayerState> CurrentPlayerState;
+
+	/** 현재 게임 모드의 게임스테이트 */
+	TWeakObjectPtr<class ATPSGameState> CurrentGameState;
 
 	/** Player ID(NickName) */
 	UPROPERTY()
@@ -48,6 +55,10 @@ private:
 	/** 플레이어 AP : AP가 남아있을때만 플레이어 대쉬(달리기)가 가능 */
 	UPROPERTY()
 	class UProgressBar* APBar;
+
+	/** Elapsed time info **/
+	UPROPERTY()
+	class UTextBlock* ElapsedTimeText;
 
 	TWeakObjectPtr<class AWeapons> CurrentWeapon;
 

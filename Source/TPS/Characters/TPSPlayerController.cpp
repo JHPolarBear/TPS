@@ -5,6 +5,7 @@
 
 #include "Characters/TPSPlayerState.h"
 #include "Characters/TPSCharacter.h"
+#include "GameSystem/TPSGameState.h"
 #include "Weapons/Weapons.h"
 #include "TPSUserWidget.h"
 
@@ -22,7 +23,6 @@ ATPSPlayerController::ATPSPlayerController()
 void ATPSPlayerController::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-
 }
 
 void ATPSPlayerController::OnPossess(APawn* aPawn)
@@ -67,5 +67,11 @@ void ATPSPlayerController::SettingWidget()
 	else
 	{
 		LOG_ERROR(TEXT("Failed to bind playerstate"));
+	}
+
+	ATPSGameState* TPSGameState = Cast<ATPSGameState>(UGameplayStatics::GetGameState(GetWorld()));
+	if(TPSGameState)
+	{
+		TPSWidget->BindGameState(TPSGameState);
 	}
 }

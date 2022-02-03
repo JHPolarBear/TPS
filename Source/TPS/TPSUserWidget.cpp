@@ -7,6 +7,7 @@
 #include "Components/TextBlock.h"
 #include "Characters/TPSPlayerState.h"
 #include "Characters/TPSCharacter.h"
+#include "GameSystem/TPSGameState.h"
 #include "Weapons/Weapons.h"
 
 // 무기 정보
@@ -27,6 +28,15 @@ bool UTPSUserWidget::BindWeapon(class AWeapons* pWeapon)
 		return false;
 	}
 
+}
+
+void UTPSUserWidget::BindGameState(class ATPSGameState* NewGameState)
+{
+	if(NewGameState)
+	{
+		CurrentGameState = NewGameState;
+		CurrentGameState->OnTimeUpdate.AddUObject(this, &UTPSUserWidget::UpdateTimeState);
+	}
 }
 
 void UTPSUserWidget::UpdateWeaponState()
@@ -70,6 +80,7 @@ void UTPSUserWidget::NativeConstruct()
 	HPBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("HP_Bar")));
 	APBar = Cast<UProgressBar>(GetWidgetFromName(TEXT("AP_Bar")));
 	ThumbnailImage = Cast<UImage>(GetWidgetFromName(TEXT("WeaponThumbnail_IMG")));
+	ElapsedTimeText = Cast<UTextBlock>(GetWidgetFromName(TEXT("ElpasedTime_Text")));
 }
 
 void UTPSUserWidget::UpdatePlayerState()
@@ -81,4 +92,16 @@ void UTPSUserWidget::UpdatePlayerState()
 
 	HPBar->SetPercent(CurrentPlayerState->GetHPRatio());
 	APBar->SetPercent(CurrentPlayerState->GetAPRatio());
+}
+
+void UTPSUserWidget::UpdateTimeState()
+{
+	float ElpasedTime = GetWorld()->GetTimeSeconds();
+
+	FTimespan ElapsedTimeSpan;
+	ElapsedTimeSpan = ElapsedTimeSpan.FromSeconds(ElpasedTime);
+
+	FString ElapsedTimeString = ElapsedTimeSpan.ToString(TEXT("%h:%m:%s"));
+
+	ElapsedTimeText->SetText(FText::FromString(ElapsedTimeString));
 }

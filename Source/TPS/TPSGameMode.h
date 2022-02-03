@@ -16,6 +16,8 @@ public:
 
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 
+	virtual void PostInitializeComponents() override;
+
 };
 
 

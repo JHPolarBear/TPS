@@ -4,6 +4,8 @@
 
 #include "CommonDefines.h"
 #include "AIController.h"
+#include "Perception/AIPerceptionComponent.h"
+#include "Perception/AIPerceptionTypes.h"
 #include "TPSAIController_MonsterBase.generated.h"
 
 /**
@@ -28,6 +30,15 @@ public:
 	void RunAI();
 	void StopAI();
 
+	UFUNCTION()
+	void OnPerceptionUpdated(const TArray<AActor*>& Actors);
+
+	UFUNCTION()
+	void OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
+
+	UFUNCTION()
+	void OnTargetPerceptionInfoUpdated(const struct FActorPerceptionUpdateInfo& UpdateInfo);
+
 private:
 
 	UPROPERTY()
@@ -35,5 +46,21 @@ private:
 
 	UPROPERTY()
 	class UBehaviorTree* BTAsset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Perception", meta = (AllowPrivateAccess = "true"))
+	class UAISenseConfig_Sight* AISenseConfig_Sight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Perception", meta = (AllowPrivateAccess = "true"))
+	float AIConfigSight_Radius = 1000.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Perception", meta = (AllowPrivateAccess = "true"))
+	float AIConfigSight_LoseSightRadius = 1400.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Perception", meta = (AllowPrivateAccess = "true"))
+	float AIConfigSight_NearClippingRadius = 100.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI Perception", meta = (AllowPrivateAccess = "true"))
+	float AIConfigSight_FieldOfView = 30.f;
+
 	
 };
