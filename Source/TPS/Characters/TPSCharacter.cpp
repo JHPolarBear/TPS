@@ -426,22 +426,6 @@ float ATPSCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageE
 	
 	if (!IsMonster)
 	{
-		// PointDamage 받기.
-		if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
-		{
-			const FPointDamageEvent* PointDamageEvent = static_cast<const FPointDamageEvent*>(&DamageEvent);
-			if (0 == (PointDamageEvent->HitInfo.BoneName).Compare(FName(TEXT("Head"))))
-			{
-				FinalDamage *= 3; // 맞은 부위가 Head면, 데미지 3배.
-				LOG_WARNING(TEXT("HEAD!HEAD!"));
-			}
-		}
-		// RadialDamage 받기.
-		else if (DamageEvent.IsOfType(FRadialDamageEvent::ClassID))
-		{
-			const FRadialDamageEvent* RadialDamageEvent = static_cast<const FRadialDamageEvent*>(&DamageEvent);
-		}
-
 		if (TPSPlayerState) 
 			TPSPlayerState->SetDamage(FinalDamage);
 

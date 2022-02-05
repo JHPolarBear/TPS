@@ -78,23 +78,6 @@ void ATPSMonsterBase::BeginPlay()
 float ATPSMonsterBase::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	float FinalDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
-
-	// PointDamage 받기.
-	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
-	{
-		const FPointDamageEvent* PointDamageEvent = static_cast<const FPointDamageEvent*>(&DamageEvent);
-		if (0 == (PointDamageEvent->HitInfo.BoneName).Compare(FName(TEXT("Head"))))
-		{
-			FinalDamage *= 10; // 맞은 부위가 Head면, 데미지 3배.
-			LOG_WARNING(TEXT("HEAD! HEAD! HEAD! HEAD! HEAD!"));
-		}
-	}
-	// RadialDamage 받기.
-	else if (DamageEvent.IsOfType(FRadialDamageEvent::ClassID))
-	{
-		const FRadialDamageEvent* RadialDamageEvent = static_cast<const FRadialDamageEvent*>(&DamageEvent);
-	}
-
 	MonsterStat->SetDamage(FinalDamage);
 
 	//LOG_WARNING(TEXT("Take Damage!! Monster"));
