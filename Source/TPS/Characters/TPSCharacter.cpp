@@ -19,6 +19,8 @@ ATPSCharacter::ATPSCharacter()
 
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
+	GetCapsuleComponent()->SetSimulatePhysics(false);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	// set our turn rates for input
 	BaseTurnRate = 45.f;
@@ -61,11 +63,11 @@ ATPSCharacter::ATPSCharacter()
 		GetMesh()->SetSkeletalMesh(SK_MESH.Object);
 	}
 
+	if (GetMesh()->GetPhysicsAsset() != nullptr)
+	{
+		LOG_WARNING(TEXT("Physics Asset OK!"));
+	}
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-
-	// Request Test
-	//static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_BP(TEXT("AnimBlueprint'/Game/AnimStarterPack/UE4ASP_HeroTPP_AnimBlueprint.UE4ASP_HeroTPP_AnimBlueprint_C'"));
-	// TPS ANIM
 
 	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_BP(TEXT("AnimBlueprint'/Game/AnimStarterPack/UE4_Mannequin/TPS_AnimBlueprint.TPS_AnimBlueprint_C'"));
 	
@@ -149,7 +151,7 @@ void ATPSCharacter::SetControlMode(E_CONTROL_MODE NewControlMode)
 
 void ATPSCharacter::OnFireStop()
 {
-	LOG_WARNING(TEXT("On Stop!!!"));
+	//LOG_WARNING(TEXT("On Stop!!!"));
 
 	SetIsFiring(false);
 
@@ -157,12 +159,20 @@ void ATPSCharacter::OnFireStop()
 }
 void ATPSCharacter::OnFire()
 {
-	LOG_WARNING(TEXT("On Fire!!!"));
+	if (Weapon && Weapon->nCurrentBulletNum > 0)
+	{
+		//LOG_WARNING(TEXT("On Fire!!!"));
 	
-	SetIsFiring(true);
+		SetIsFiring(true);
 
-	// 첫발을 위해서 초기 셋팅
-	FireDeltaTime = Weapon->GetFireRate();
+		// 첫발을 위해서 초기 셋팅
+		FireDeltaTime = Weapon->GetFireRate();
+	}
+	else
+	{
+		LOG_WARNING(TEXT("Require Reload~"));
+		return;
+	}
 }
 
 void ATPSCharacter::SetIsFiring(bool setFiring)
@@ -174,7 +184,7 @@ void ATPSCharacter::SetIsFiring(bool setFiring)
 		if (TPSAnimInstance->GetIsFireCheck() != IsFiring) 
 		{
 			TPSAnimInstance->SetIsFire(IsFiring);
-			LOG_WARNING(TEXT("Attack!!!"));
+			//LOG_WARNING(TEXT("Attack!!!"));
 		}
 	}
 }
@@ -191,7 +201,7 @@ void ATPSCharacter::BeginPlay()
 
 	if(!IsMonster)
 	{
-		LOG_WARNING(TEXT("Character Controller Setting start"));
+		//LOG_WARNING(TEXT("Character Controller Setting start"));
 
 		// 컨트롤러 셋팅
 		TPSPlayerController = Cast<ATPSPlayerController>(GetController());
@@ -212,7 +222,7 @@ void ATPSCharacter::BeginPlay()
 			TPSPlayerState->SetBulletCount(Weapon->nCurrentBulletNum);
 		}
 
-		LOG_WARNING(TEXT("Character Controller Setting end"));
+		//LOG_WARNING(TEXT("Character Controller Setting end"));
 	}
 }
 
@@ -226,18 +236,18 @@ void ATPSCharacter::Tick(float DeltaTime)
 	// 카메라 필드오브뷰 축소방법
 	FollowCamera->FieldOfView = FMath::FInterpTo(FollowCamera->FieldOfView, ArmLegthTo, DeltaTime, ArmLegthSpeed);
 
-	if (GetIsFiring())
+	if (GetIsFiring() && Weapon && Weapon->nCurrentBulletNum > 0)
 	{
 		if (FireDeltaTime >= Weapon->GetFireRate())
 		{
-			if (Weapon)
-			{
-				Weapon->OnFire(this);
-				if(TPSPlayerState) TPSPlayerState->SetBulletCount(Weapon->nCurrentBulletNum);
-			}
+			Weapon->OnFire(this);
+
+			if (TPSPlayerState) 
+				TPSPlayerState->SetBulletCount(Weapon->nCurrentBulletNum);
+
 			FireDeltaTime = 0.0f;
 			// 단발 총(권총)인 경우에는 연발 안되게처리
-			if (!Weapon->bFullAutoFire)
+			if (!Weapon->bFullAutoFire || Weapon->nCurrentBulletNum == 0)
 			{
 				SetIsFiring(false);
 			}
@@ -298,7 +308,7 @@ void ATPSCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInput
 }
 void ATPSCharacter::OnReloadingStart()
 {
-	LOG_WARNING(TEXT("OnReloadingStart!!!"));
+	//LOG_WARNING(TEXT("OnReloadingStart!!!"));
 
 	// 장전중 다시누르면 장전 취소
 	if(Weapon->bIsReloading)
@@ -307,7 +317,7 @@ void ATPSCharacter::OnReloadingStart()
 		TPSAnimInstance->SetIsReloading(Weapon->bIsReloading);
 
 		GetWorldTimerManager().ClearTimer(ReloadTimer);
-		LOG_WARNING(TEXT("OnReloadingStart Cancel!!!"));
+		//LOG_WARNING(TEXT("OnReloadingStart Cancel!!!"));
 	}
 	// 장전시작
 	else
@@ -316,7 +326,7 @@ void ATPSCharacter::OnReloadingStart()
 		TPSAnimInstance->SetIsReloading(Weapon->bIsReloading);
 
 		GetWorldTimerManager().SetTimer(ReloadTimer, this, &ATPSCharacter::OnReloadingEnd, 2, false);
-		LOG_WARNING(TEXT("OnReloadingStart2!!!"));
+		//LOG_WARNING(TEXT("OnReloadingStart2!!!"));
 	}
 }
 
@@ -329,7 +339,7 @@ void ATPSCharacter::OnReloadingEnd()
 		TPSAnimInstance->SetIsReloading(Weapon->bIsReloading);
 		Weapon->nCurrentBulletNum = Weapon->nMaxBulletNum;
 		if(TPSPlayerState) TPSPlayerState->SetBulletCount(Weapon->nCurrentBulletNum);
-		LOG_WARNING(TEXT("OnReloadingEnd!!!"));
+		//LOG_WARNING(TEXT("OnReloadingEnd!!!"));
 	}
 }
 
@@ -416,6 +426,22 @@ float ATPSCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageE
 	
 	if (!IsMonster)
 	{
+		// PointDamage 받기.
+		if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
+		{
+			const FPointDamageEvent* PointDamageEvent = static_cast<const FPointDamageEvent*>(&DamageEvent);
+			if (0 == (PointDamageEvent->HitInfo.BoneName).Compare(FName(TEXT("Head"))))
+			{
+				FinalDamage *= 3; // 맞은 부위가 Head면, 데미지 3배.
+				LOG_WARNING(TEXT("HEAD!HEAD!"));
+			}
+		}
+		// RadialDamage 받기.
+		else if (DamageEvent.IsOfType(FRadialDamageEvent::ClassID))
+		{
+			const FRadialDamageEvent* RadialDamageEvent = static_cast<const FRadialDamageEvent*>(&DamageEvent);
+		}
+
 		if (TPSPlayerState) 
 			TPSPlayerState->SetDamage(FinalDamage);
 

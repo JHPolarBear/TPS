@@ -3,51 +3,48 @@
 
 #include "Weapons/WeaponLineTrace.h"
 #include "Characters/TPSCharacter.h"
+#include "Monsters/TPSMonsterBase.h"
 #include "GameFramework/PlayerController.h"
 #include "Runtime/Engine/Public/DrawDebugHelpers.h"
 
 
 void UWeaponLineTrace::OnFire( ATPSCharacter* Character )
 {
-	FVector WorldLocation;
-	FVector WorldDirection;
-	
 	int x, y;
+	FHitResult hit;
 
 	Character->GetWorld()->GetFirstPlayerController()->GetViewportSize(x,y);
-	Character->GetWorld()->GetFirstPlayerController()->DeprojectScreenPositionToWorld(x*0.5f,y*0.5f,WorldLocation,WorldDirection);
-
+	Character->GetWorld()->GetFirstPlayerController()->GetHitResultAtScreenPosition(FVector2D(x * 0.5f, y * 0.5f), ECC_Visibility, false, hit);
+	
 	FQuat rotator = FQuat(Character->GetControlRotation());
-	FVector MuzzleLocation = Character->GetWeapon()->GetMuzzleLocation(); // + rotator.RotateVector(Character->Weapon->SpawnOffset);
+	FVector MuzzleLocation = Character->GetWeapon()->GetMuzzleLocation();
 
 	FVector start = MuzzleLocation;
-	FVector end = WorldLocation;;//MuzzleLocation + rotator.GetForwardVector() * 10000.f;
+	FVector end = FVector::ZeroVector;
 
-	DrawDebugLine(Character->GetWorld(), start, end, FColor::Green, false, 0.5f);
+	if (hit.GetActor() != NULL)
+	{
+		end = FVector(hit.Location.X, hit.Location.Y, hit.Location.Z);
+	}
 
 	FCollisionQueryParams collision_params;
 	collision_params.AddIgnoredActor(Character);
 
-	FHitResult hit;
+	FColor Line_Color = FColor::Green;
 
 	Character->GetWorld()->LineTraceSingleByChannel(hit, start, end, ECollisionChannel::ECC_PhysicsBody, collision_params);
 
 	if (hit.GetActor() != NULL)
 	{
-		LOG_WARNING(TEXT("Hit! not null"));
+		//LOG_WARNING(TEXT("Hit! not null"));
+
 		if (hit.GetActor()->IsRootComponentMovable())
 		{
-			USceneComponent* root = hit.GetActor()->GetRootComponent();
-			UStaticMeshComponent* mesh = Cast<UStaticMeshComponent>(root);
-
-			//RetNull(mesh);
-			if (mesh)
-			{
-				if (mesh->IsSimulatingPhysics())
-					mesh->AddForce(rotator.GetForwardVector() * 1e+5f * mesh->GetMass());
-
-				LOG_WARNING(TEXT("Mesh Hit!"));
-			}
+			LOG_WARNING(TEXT("Movable Hit!"));
+			Line_Color = FColor::Red;
 		}
 	}
+
+	DrawDebugLine(Character->GetWorld(), start, end, Line_Color, false, 1.0f);
+
 }
