@@ -1,10 +1,13 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "Projectile.h"
 #include "CommonDefines.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
+
+#include "Engine/EngineTypes.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
 
 #include "Monsters/TPSMonsterBase.h"
 
@@ -28,6 +31,7 @@ AProjectile::AProjectile()
 	CollisionComponent->SetSimulatePhysics(false);
 	CollisionComponent->SetGenerateOverlapEvents(true);
 	CollisionComponent->SetCollisionResponseToAllChannels(ECR_Block);
+	//CollisionComponent->bReturnMaterialOnMove = true;
 
 	// Set as root component
 	RootComponent = CollisionComponent;
@@ -51,7 +55,7 @@ AProjectile::AProjectile()
 	ProjectileMovement->MaxSpeed = 50000.f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = true;
-	//  �߷� ����
+	//  �߷� ����
 	ProjectileMovement->ProjectileGravityScale = 0.0f;
 
 	// Die after 10 seconds by default
@@ -95,12 +99,21 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, U
 		LOG_WARNING(TEXT("Hit!! Player"));
 	}
 
+	float Damage = 10.f;
+
+	// FHitResult 에서 명중한 본 이름을 가져와 비교
+	FString HitPartsName = Hit.BoneName.ToString();
+	if (HitPartsName.Compare("head") == 0)
+	{
+		Damage = 100.f;
+		LOG_WARNING(TEXT("Head Shot!"));
+	}
+
 	auto Monster = Cast<ATPSMonsterBase>(OtherActor);
 	if(Monster)
 	{
 		FDamageEvent DamageEvent;
-		Monster->TakeDamage(10, DamageEvent, nullptr, this);
-		LOG_WARNING(TEXT("Hit!! Monster"));
+		Monster->TakeDamage(Damage, DamageEvent, nullptr, this);
 	}
 
 	Destroy();
