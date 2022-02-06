@@ -130,7 +130,7 @@ void ATPSPlayerState::Init()
 	CurrentHP = 100;
 	CurrentAP = 100;
 
-	DecreaseAmountAP = 0.5;
+	DecreaseAmountAP = 0.5f;
 	
 	MaxBulletCount = 0;
 	BulletCount = 0;

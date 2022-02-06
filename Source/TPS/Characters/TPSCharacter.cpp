@@ -19,8 +19,8 @@ ATPSCharacter::ATPSCharacter()
 
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
-	GetCapsuleComponent()->SetSimulatePhysics(false);
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	//GetCapsuleComponent()->SetSimulatePhysics(false);
+	//GetCapsuleComponent()->SetCollisionObjectType(ECollisionChannel::ECC_Pawn);
 
 	// set our turn rates for input
 	BaseTurnRate = 45.f;
@@ -33,6 +33,7 @@ ATPSCharacter::ATPSCharacter()
 
 	GetMesh()->SetRelativeLocation(FVector(0.0f, 0.0f, -96.0f));
 	GetMesh()->SetRelativeRotation(FRotator(0.0f, -90.0f, 0.0f));
+	//GetMesh()->SetCollisionObjectType(ECollisionChannel::ECC_PhysicsBody);
 
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = false; // Character moves in the direction of input...	
@@ -69,7 +70,7 @@ ATPSCharacter::ATPSCharacter()
 	}
 	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
 
-	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_BP(TEXT("AnimBlueprint'/Game/AnimStarterPack/UE4_Mannequin/TPS_AnimBlueprint.TPS_AnimBlueprint_C'"));
+	static ConstructorHelpers::FClassFinder<UAnimInstance> ANIM_BP(TEXT("AnimBlueprint'/Game/Animations/TPS_AnimBlueprint.TPS_AnimBlueprint_C'"));
 	
 	if (ANIM_BP.Succeeded())
 	{
@@ -82,6 +83,7 @@ ATPSCharacter::ATPSCharacter()
 
 	IsDeath = false;
 	IsMonster = false;
+	IsSprint = false;
 
 	TPSPlayerController = NULL;
 	TPSPlayerState = NULL;
@@ -159,6 +161,8 @@ void ATPSCharacter::OnFireStop()
 }
 void ATPSCharacter::OnFire()
 {
+	OnSprintStop();
+
 	if (Weapon && Weapon->nCurrentBulletNum > 0)
 	{
 		//LOG_WARNING(TEXT("On Fire!!!"));
@@ -172,6 +176,22 @@ void ATPSCharacter::OnFire()
 	{
 		LOG_WARNING(TEXT("Require Reload~"));
 		return;
+	}
+}
+void ATPSCharacter::OnSprintStop()
+{
+	if (IsSprint && TPSPlayerState)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = TPSPlayerState->GetDefaultWalkSpeed();
+		IsSprint = false;
+	}
+}
+void ATPSCharacter::OnSprint()
+{
+	if(!IsSprint && TPSPlayerState)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = TPSPlayerState->GetDefaultWalkSpeed() * TPSPlayerState->GetRunMultiplier();
+		IsSprint = true;
 	}
 }
 
@@ -214,7 +234,7 @@ void ATPSCharacter::BeginPlay()
 			ASSERT_CHECK(TPSPlayerState != nullptr);
 
 			TPSPlayerState->SetDefaultWalkSpeed(GetCharacterMovement()->MaxWalkSpeed);
-			TPSPlayerState->SetRunMultiplier(2.0f);
+			TPSPlayerState->SetRunMultiplier(5.0f);
 
 			TPSPlayerController->SettingWidget();
 
@@ -258,6 +278,22 @@ void ATPSCharacter::Tick(float DeltaTime)
 		}
 	}
 		
+	if(TPSPlayerState)
+	{
+		if (!IsSprint)
+			TPSPlayerState->IncreaseAP();
+		else
+		{
+			if ( TPSPlayerState->GetCurrentAP() > 0 )
+				TPSPlayerState->DecreaseAP();
+			else
+				OnSprintStop();
+
+			if (GetIsFiring())
+				OnSprintStop();
+		}
+	}
+
 	/*switch (CurrentColtrolMode)
 	{
 	case EControlMode::TPS:
@@ -303,6 +339,10 @@ void ATPSCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInput
 	// Fire event
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ATPSCharacter::OnFire);
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ATPSCharacter::OnFireStop);
+
+	// Sprint event
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ATPSCharacter::OnSprint);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ATPSCharacter::OnSprintStop);
 
 	PlayerInputComponent->BindAction("Reloading", IE_Released, this, &ATPSCharacter::OnReloadingStart);
 }
@@ -400,6 +440,8 @@ void ATPSCharacter::MoveForward(float Value)
 
 		// get forward vector
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+
+		if (IsSprint && TPSPlayerState) Value *= TPSPlayerState->GetRunMultiplier();
 		AddMovementInput(Direction, Value);
 	}
 }
@@ -414,6 +456,8 @@ void ATPSCharacter::MoveRight(float Value)
 	
 		// get right vector 
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+
+		if (IsSprint && TPSPlayerState) Value *= TPSPlayerState->GetRunMultiplier();
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
 	}

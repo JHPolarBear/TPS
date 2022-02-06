@@ -66,7 +66,7 @@ void AWeapons::LoadSkeletalMeshType(E_WEAPON_TYPE e_WeaponType)
 	ParticleSystemComponent->SetHiddenInGame(false);
 	ParticleSystemComponent->SetRelativeLocation(SpawnOffset);
 
-	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("ParticleSystem'/Game/AnimStarterPack/UE4_Mannequin/P_Ranged_Firey_Impact.P_Ranged_Firey_Impact'"));
+	static ConstructorHelpers::FObjectFinder<UParticleSystem> ParticleAsset(TEXT("ParticleSystem'/Game/Effects/P_Ranged_Firey_Impact.P_Ranged_Firey_Impact'"));
 
 	if (ParticleAsset.Succeeded())
 	{
@@ -77,7 +77,7 @@ void AWeapons::LoadSkeletalMeshType(E_WEAPON_TYPE e_WeaponType)
 	AudioComponent->bAutoActivate = false;
 	AudioComponent->SetupAttachment(Weapon);
 
-	static ConstructorHelpers::FObjectFinder<USoundBase> FireSound(TEXT("SoundCue'/Game/AnimStarterPack/UE4_Mannequin/FireSound.FireSound'"));
+	static ConstructorHelpers::FObjectFinder<USoundBase> FireSound(TEXT("SoundCue'/Game/Sound/FireSound.FireSound'"));
 	if (FireSound.Succeeded())
 	{
 		AudioComponent->SetSound(FireSound.Object);

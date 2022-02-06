@@ -13,7 +13,7 @@ class ATPSCharacter;
 
 ATPSPlayerController::ATPSPlayerController()
 {
-	static ConstructorHelpers::FClassFinder<UTPSUserWidget> UI_TPS_C(TEXT("WidgetBlueprint'/Game/UI/HUD.HUD_C'"));
+	static ConstructorHelpers::FClassFinder<UTPSUserWidget> UI_TPS_C(TEXT("WidgetBlueprint'/Game/UI/UI_HUD.UI_HUD_C'"));
 	if (UI_TPS_C.Succeeded())
 	{
 		TPSWidgetClass = UI_TPS_C.Class;

@@ -73,6 +73,12 @@ protected:
 	UFUNCTION()
 	virtual void OnFireStop();
 
+	bool IsSprint;
+	UFUNCTION()
+	virtual void OnSprint();
+	UFUNCTION()
+	virtual void OnSprintStop();
+
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Anim)
 	class UTPSAnimInstance* TPSAnimInstance;
 
