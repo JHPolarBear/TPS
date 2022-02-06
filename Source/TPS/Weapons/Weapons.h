@@ -65,10 +65,6 @@ public:
 	UPROPERTY(EditAnywhere)
 	FVector SpawnOffset;
 
-	/** AnimMontage to play each time we fire */
-	UPROPERTY(EditAnywhere)
-	class UAnimMontage* FireAnimation;
-
 	/** Projectile class to spawn */
 	UPROPERTY(EditDefaultsOnly, Category = Projectile)
 	TSubclassOf<class AProjectile> ProjectileClass;

@@ -12,7 +12,7 @@ ARifle::ARifle()
 
 	nMaxBulletNum = 30;
 	nCurrentBulletNum = nMaxBulletNum;
-	FireRate = 0.2f;
+	FireRate = 0.25f;
 	ThumbnailPath = TEXT("Texture2D'/Game/Textures/ak47.ak47'");
 }
 
