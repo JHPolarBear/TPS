@@ -26,7 +26,14 @@ public:
 
 	virtual void Tick( float DeltaSeconds ) override;
 
+	float GetRemainTime() const;
+
 private:
-	FTimerHandle PlayTimeHandler;	
+	UPROPERTY()
+	float MaxGameTime = 60.f;
+
+	UPROPERTY(Transient)
+	float ElapsedTime  = 0.f;
+
 	
 };

@@ -96,10 +96,17 @@ void UTPSUserWidget::UpdatePlayerState()
 
 void UTPSUserWidget::UpdateTimeState()
 {
-	float ElpasedTime = GetWorld()->GetTimeSeconds();
+	//float ElpasedTime = GetWorld()->GetTimeSeconds();
+	
+	float RemainTime = 0.f;
+	
+	if(CurrentGameState != nullptr)
+	{
+		RemainTime = CurrentGameState->GetRemainTime();
+	}
 
 	FTimespan ElapsedTimeSpan;
-	ElapsedTimeSpan = ElapsedTimeSpan.FromSeconds(ElpasedTime);
+	ElapsedTimeSpan = ElapsedTimeSpan.FromSeconds(RemainTime);
 
 	FString ElapsedTimeString = ElapsedTimeSpan.ToString(TEXT("%h:%m:%s"));
 
