@@ -9,6 +9,7 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Weapons/Rifle.h"
+#include "Monsters/TPSAIController_MonsterBase.h"
 
 //////////////////////////////////////////////////////////////////////////
 // ATPSCharacter
@@ -482,6 +483,60 @@ float ATPSCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageE
 	}
 
 	return FinalDamage;
+}
+
+ETeamAttitude::Type ATPSCharacter::CompareTeamAttribute(const ATPSCharacter& OtherCharacter)
+{
+	ETeamAttitude::Type OtherType = ETeamAttitude::Neutral;
+
+	FGenericTeamId OtherTeamID;
+	FGenericTeamId TeamID;
+
+	if(IsPlayerControlled())
+	{
+		ATPSPlayerController* PlayerController = Cast<ATPSPlayerController>(GetController());
+		if(PlayerController)
+			TeamID = PlayerController->GetGenericTeamId();
+	}
+	else
+	{	
+		ATPSAIController_MonsterBase* AIController = Cast<ATPSAIController_MonsterBase>(GetController());
+		if (AIController != nullptr)
+		{
+			TeamID = AIController->GetGenericTeamId();
+		}
+	}
+
+	if(TeamID.GetId() == 255)
+	{
+		LOG_ERROR(TEXT("Faild to find team id for current player"));
+	}
+
+	if(OtherCharacter.IsPlayerControlled() == false)
+	{
+		ATPSAIController_MonsterBase* BotAIController = Cast<ATPSAIController_MonsterBase>(OtherCharacter.GetController());
+		if(BotAIController !=nullptr)
+		{
+			OtherTeamID = BotAIController->GetGenericTeamId();
+		}
+	}
+	else
+	{
+		ATPSPlayerController* PlayerController = Cast<ATPSPlayerController>(OtherCharacter.GetController());
+		if(PlayerController)
+		{
+			OtherTeamID = PlayerController->GetGenericTeamId();
+		}
+	}
+
+	if(OtherTeamID.GetId() != 255)	// 255 means no team
+	{
+		LOG_ERROR(TEXT("Faild to find team id for other player"));
+	}
+
+	OtherType = TeamID.GetAttitude(TeamID, OtherTeamID);
+
+	return OtherType;
 }
 
 void ATPSCharacter::StartDeathAction()

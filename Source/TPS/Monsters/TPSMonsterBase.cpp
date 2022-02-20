@@ -57,6 +57,12 @@ void ATPSMonsterBase::BeginPlay()
 	ATPSAIController_MonsterBase* TPSAIController = Cast<ATPSAIController_MonsterBase>(GetController());
 	if(TPSAIController)
 	{
+		// 팀 ID에 따라서 메테리얼 색상 변경
+		SetSkeletonTeamColor();
+
+		FGenericTeamId GenericTeamID(TeamID);
+		TPSAIController->SetGenericTeamId(GenericTeamID);
+
 		TPSAIController->RunAI();
 	}
 
@@ -159,4 +165,34 @@ void ATPSMonsterBase::OnDeadAction()
 		Weapon->Destroy();
 
 	Destroy();
+}
+
+void ATPSMonsterBase::SetSkeletonTeamColor()
+{
+	UMaterialInterface* MeshMaterial = GetMesh()->GetMaterial(0);
+	ASSERT_CHECK(MeshMaterial != nullptr);
+
+	DynamicBodyMaterial = UMaterialInstanceDynamic::Create(MeshMaterial, NULL);
+	ASSERT_CHECK(DynamicBodyMaterial);
+
+	GetMesh()->SetMaterial(0, DynamicBodyMaterial);
+
+	switch (TeamID)
+	{
+	case 1:
+	{
+		DynamicBodyMaterial->SetVectorParameterValue(FName(TEXT("BodyColor")), FLinearColor::Red);
+	}
+	break;
+	case 2:
+	{
+		DynamicBodyMaterial->SetVectorParameterValue(FName(TEXT("BodyColor")), FLinearColor::Blue);
+	}
+	break;
+	default:
+	{
+		DynamicBodyMaterial->SetVectorParameterValue(FName(TEXT("BodyColor")), FLinearColor::White);
+	}
+	break;
+	}
 }

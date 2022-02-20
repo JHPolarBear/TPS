@@ -4,6 +4,8 @@
 
 #include "EngineMinimal.h"
 
+#include "GenericTeamAgentInterface.h"
+
 DECLARE_LOG_CATEGORY_EXTERN(TPSGame, Log, All);
 
 // Custom Log and Null check

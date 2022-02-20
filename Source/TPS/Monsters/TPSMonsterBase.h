@@ -34,6 +34,8 @@ public:
 
 	void OnDeadAction();
 
+	void SetSkeletonTeamColor();
+
 	// 사망 시 동작하는 타이머
 	FTimerHandle DeadActionHandler;
 	// 사망 후 잔여 시간
@@ -44,10 +46,16 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI, meta = (AllowPrivateAccess = true) )
 	float RandomPatrolRadiusMax = 1000.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = AI, meta = (AllowPrivateAccess = true))
+	int	TeamID = 255;
+
 	UPROPERTY(VisibleAnywhere, Category = Stat)
 	class UTPSMonsterBase_StatComponent* MonsterStat;
 
 	UPROPERTY(VisibleAnywhere, Category = Stat)
 	class UWidgetComponent* StatWidget;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh, meta = (AllowPrivateAccess = true))
+	class UMaterialInstanceDynamic* DynamicBodyMaterial;
 	
 };

@@ -63,6 +63,8 @@ public:
 
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
+	ETeamAttitude::Type CompareTeamAttribute(const ATPSCharacter& OtherCharacter);
+
 protected:
 
 	UPROPERTY(VisibleAnywhere)

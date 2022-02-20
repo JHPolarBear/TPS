@@ -39,6 +39,16 @@ void ATPSPlayerController::BeginPlay()
 
 
 }
+
+void ATPSPlayerController::SetGenericTeamId(const FGenericTeamId& NewTeamID)
+{
+	if (TeamID != NewTeamID)
+	{
+		TeamID = NewTeamID;
+		// @todo notify perception system that a controller changed team ID
+	}
+}
+
 void ATPSPlayerController::SettingWidget()
 {
 	TPSWidget = CreateWidget<UTPSUserWidget>(this, TPSWidgetClass);

@@ -115,7 +115,16 @@ void ATPSAIController_MonsterBase::OnTargetPerceptionInfoUpdated(const FActorPer
 			Blackboard->SetValueAsObject(TargetKey, nullptr);
 		else
 		{
-			Blackboard->SetValueAsObject(TargetKey, Player);
+			ETeamAttitude::Type OtherAttr = ETeamAttitude::Neutral;
+
+			ATPSCharacter* AIOwner = Cast<ATPSCharacter>(GetPawn());
+			if(AIOwner)
+			{
+				OtherAttr =  AIOwner->CompareTeamAttribute(*Player);
+			}
+
+			if(OtherAttr == ETeamAttitude::Hostile)
+				Blackboard->SetValueAsObject(TargetKey, Player);
 		}
 	}
 }

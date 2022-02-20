@@ -4,6 +4,8 @@
 
 #include "CommonDefines.h"
 #include "GameFramework/PlayerController.h"
+
+
 #include "TPSPlayerController.generated.h"
 
 /**
@@ -31,5 +33,16 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = UI)
 	TSubclassOf<class UTPSUserWidget> TPSWidgetClass;
+
+//----------------------------------------------------------------------//
+// IGenericTeamAgentInterface
+//----------------------------------------------------------------------//
+// Bot ai와 팀 구분에 동일한 인터페이스를 사용하기 위해 추가
+private:
+	FGenericTeamId TeamID;
+
+public:
+	void SetGenericTeamId(const FGenericTeamId& NewTeamID);
+	FGenericTeamId GetGenericTeamId() const { return TeamID; }
 
 };
