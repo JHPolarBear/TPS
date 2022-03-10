@@ -47,6 +47,8 @@ ATPSMonsterBase::ATPSMonsterBase()
 	IsMonster = true;
 
 	DeadActionTime = 2.0f;
+
+	PrimaryActorTick.bCanEverTick = true;
 }
 
 void ATPSMonsterBase::BeginPlay()
@@ -91,6 +93,26 @@ float ATPSMonsterBase::TakeDamage(float Damage, struct FDamageEvent const& Damag
 	return FinalDamage;
 }
 
+void ATPSMonsterBase::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	ATPSAIController_MonsterBase* AIController = Cast<ATPSAIController_MonsterBase>(GetController());
+	if(AIController)
+	{
+		AIController->GetPerceptionComponent()->RequestStimuliListenerUpdate();
+
+		TArray<AActor*> HotileActors;
+
+		AIController->GetPerceptionComponent()->GetHostileActors(HotileActors);
+
+		if(HotileActors.Num())
+		{
+			
+		}
+	}
+}
+
 void ATPSMonsterBase::AimTarget(FVector TargetLocation)
 {
 	FRotator LookAt = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetLocation);
@@ -132,17 +154,17 @@ void ATPSMonsterBase::OnDead()
 {
 	if(GetController())
 	{
-		StartDeathAction();
-
-		// 향후에는 모든 액션을 멈추는 기능으로 통합할 것
-		OnFireStop();
-
 		// Start ai behavior tree
 		ATPSAIController_MonsterBase* TPSAIController = Cast<ATPSAIController_MonsterBase>(GetController());
 		if (TPSAIController)
 		{
 			TPSAIController->StopAI();
 		}
+
+		StartDeathAction();
+
+		// 향후에는 모든 액션을 멈추는 기능으로 통합할 것
+		OnFireStop();
 
 		GetController()->StopMovement();
 		GetController()->UnPossess();

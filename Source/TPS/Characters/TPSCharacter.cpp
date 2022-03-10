@@ -243,7 +243,14 @@ void ATPSCharacter::BeginPlay()
 			TPSPlayerState->SetBulletCount(Weapon->nCurrentBulletNum);
 		}
 
+		// EQS에서 플레이어 검출에 사용할 플레이어 태그 추가
+		Tags.Add(FName("Player"));
+
 		//LOG_WARNING(TEXT("Character Controller Setting end"));
+	}
+	else
+	{
+		
 	}
 }
 

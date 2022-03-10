@@ -16,6 +16,7 @@ const FName ATPSAIController_MonsterBase::StartPosKey(TEXT("StartPos"));
 const FName ATPSAIController_MonsterBase::NextPosKey(TEXT("NextPos"));
 const FName ATPSAIController_MonsterBase::TargetKey(TEXT("Target"));
 const FName ATPSAIController_MonsterBase::IsAttackableKey(TEXT("IsAttackable"));
+const FName ATPSAIController_MonsterBase::HasLineOfSightKey(TEXT("HasLineOfSight"));
 
 ATPSAIController_MonsterBase::ATPSAIController_MonsterBase()
 {
@@ -93,6 +94,7 @@ void ATPSAIController_MonsterBase::StopAI()
 void ATPSAIController_MonsterBase::OnPerceptionUpdated(const TArray<AActor*>& Actors)
 {
 	// 감지된 모든 액터를 전달 받아 처리해야 할 경우
+	LOG_WARNING(TEXT("Detected actor size : %d"), Actors.Num());
 }
 
 void ATPSAIController_MonsterBase::OnTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
@@ -102,15 +104,33 @@ void ATPSAIController_MonsterBase::OnTargetPerceptionUpdated(AActor* Actor, FAIS
 	if(Player)
 	{
 		LOG_WARNING(TEXT("Player Pos : [ %f, %f]"), Player->GetActorLocation().X, Player->GetActorLocation().Y);
+
+		if(Player->ActorHasTag(FName("Player")) && Stimulus.WasSuccessfullySensed())
+		{
+			GetWorld()->GetTimerManager().ClearTimer(LostSightTimer);
+
+			UpdateSightKey(true);
+			UpdateTargetKey(Player);
+		}
+		else
+		{
+			GetWorld()->GetTimerManager().SetTimer(LostSightTimer, this, &ATPSAIController_MonsterBase::LostSight_Implementation, 8.f, false);
+			UpdateSightKey(false);
+		}
 	}
 }
 
 void ATPSAIController_MonsterBase::OnTargetPerceptionInfoUpdated(const FActorPerceptionUpdateInfo& UpdateInfo)
 {
-	ATPSCharacter* Player = Cast<ATPSCharacter>(UpdateInfo.Target);
+	if(GetPawn()->IsValidLowLevel())
+		return;
 
+	ATPSCharacter* Player = Cast<ATPSCharacter>(UpdateInfo.Target);
+	
 	if(Player)
 	{
+		LOG_WARNING(TEXT("Current player : %s, Indicated Player Info : %s"), *(this->GetPawn()->GetName()), *Player->GetName());
+
 		if(UpdateInfo.Stimulus.WasSuccessfullySensed() == false)
 			Blackboard->SetValueAsObject(TargetKey, nullptr);
 		else
@@ -123,8 +143,29 @@ void ATPSAIController_MonsterBase::OnTargetPerceptionInfoUpdated(const FActorPer
 				OtherAttr =  AIOwner->CompareTeamAttribute(*Player);
 			}
 
-			if(OtherAttr == ETeamAttitude::Hostile)
+			if(OtherAttr == ETeamAttitude::Hostile && GetGenericTeamId().GetId() != 1)
 				Blackboard->SetValueAsObject(TargetKey, Player);
 		}
 	}
+	else
+	{
+		LOG_WARNING(TEXT("Failed to find player"));
+		Blackboard->SetValueAsObject(TargetKey, nullptr);
+	}
+	
+}
+
+void ATPSAIController_MonsterBase::LostSight_Implementation()
+{
+	UpdateTargetKey(nullptr);
+}
+
+void ATPSAIController_MonsterBase::UpdateSightKey(bool _val)
+{
+	Blackboard->SetValueAsBool(HasLineOfSightKey, _val);
+}
+
+void ATPSAIController_MonsterBase::UpdateTargetKey(AActor* actor)
+{
+	Blackboard->SetValueAsObject(TargetKey, actor);
 }

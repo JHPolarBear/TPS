@@ -21,6 +21,8 @@ public:
 
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
+	virtual void Tick(float DeltaSeconds) override;
+
 	float GetRandomPatrolRadiusMax()	{return RandomPatrolRadiusMax;}
 
 public:
