@@ -477,15 +477,18 @@ float ATPSCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageE
 {
 	float FinalDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 	
-	if (TPSPlayerState)
-		TPSPlayerState->SetDamage(FinalDamage);
-
-	if (TPSPlayerState->GetCurrentHP() <= 0)
+	if (!IsMonster)
 	{
-		StartDeathAction();
-	}
+		if (TPSPlayerState) 
+			TPSPlayerState->SetDamage(FinalDamage);
 
-	LOG_WARNING(TEXT("Take Damage!! Player"));
+		if (TPSPlayerState->GetCurrentHP() <= 0)
+		{
+			StartDeathAction();
+		}
+
+		LOG_WARNING(TEXT("Take Damage!! Player"));
+	}
 
 	return FinalDamage;
 }

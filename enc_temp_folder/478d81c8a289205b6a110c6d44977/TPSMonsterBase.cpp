@@ -85,7 +85,7 @@ void ATPSMonsterBase::BeginPlay()
 
 float ATPSMonsterBase::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	float FinalDamage = AActor::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+	float FinalDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 	MonsterStat->SetDamage(FinalDamage);
 
 	//LOG_WARNING(TEXT("Take Damage!! Monster"));

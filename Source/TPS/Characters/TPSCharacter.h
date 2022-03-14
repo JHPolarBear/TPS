@@ -61,10 +61,11 @@ public:
 
 	ATPSPlayerState* GetTPSPlayerState() { return TPSPlayerState; }
 
-	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
-
 	ETeamAttitude::Type CompareTeamAttribute(const ATPSCharacter& OtherCharacter);
 
+	int GetCurrentBulletNum();
+
+	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 protected:
 
 	UPROPERTY(VisibleAnywhere)

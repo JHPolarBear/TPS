@@ -25,10 +25,6 @@ public:
 
 	E_WEAPON_TYPE mWeponType;
 
-	int nMaxBulletNum;
-	int nCurrentBulletNum;
-	bool bIsReloading;
-
 	bool bFullAutoFire;
 	float FireRate;
 	float CurrentFireDeltaTime;
@@ -86,8 +82,28 @@ public:
 
 	FOnWeaponStateChangedDelegate OnWeaponStateChanged;
 
+	int GetMaxBulletNum() { return nMaxBulletNum; };
+	int GetCurrentBulletNum() { return nCurrentBulletNum; };
+
+	void SetMaxBulletNum( int _nMaxBulletNum ) {  nMaxBulletNum = _nMaxBulletNum; };
+	void SetCurrentBulletNum(int _nCurrentBulletNum) { nCurrentBulletNum = _nCurrentBulletNum; };
+	
+	void SetReloadingEnd() 
+	{ 
+		nCurrentBulletNum = nMaxBulletNum; 
+		SetIsReloading(false);
+	};
+
+	bool GetIsReloading() { return bIsReloading; };
+	void SetIsReloading( bool _bIsReloading ) { bIsReloading = _bIsReloading; };
+
+private:
+	bool bIsReloading;
+
 protected:
 
+	int nMaxBulletNum;
+	int nCurrentBulletNum;
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
