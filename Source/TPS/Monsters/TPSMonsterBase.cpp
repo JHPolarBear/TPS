@@ -14,9 +14,8 @@
 
 ATPSMonsterBase::ATPSMonsterBase()
 {
-	// Disable Camera component's tick
-	GetCameraBoom()->Deactivate();
-	GetFollowCamera()->Deactivate();
+	CameraBoom = nullptr;
+	FollowCamera = nullptr;
 
 	MonsterStat = CreateDefaultSubobject<UTPSMonsterBase_StatComponent>(TEXT("StatComponent"));
 
