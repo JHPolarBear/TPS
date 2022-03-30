@@ -71,3 +71,20 @@ void ATPSPlayer::Tick(float DeltaTime)
 		break;
 	}*/
 }
+
+float ATPSPlayer::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float FinalDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+
+	if (TPSPlayerState)
+		TPSPlayerState->SetDamage(FinalDamage);
+
+	if (TPSPlayerState->GetCurrentHP() <= 0)
+	{
+		StartDeathAction();
+	}
+
+	LOG_WARNING(TEXT("Take Damage!! Player"));
+
+	return FinalDamage;
+}
