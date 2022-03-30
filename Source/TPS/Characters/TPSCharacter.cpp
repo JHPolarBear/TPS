@@ -41,20 +41,7 @@ ATPSCharacter::ATPSCharacter()
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
 	GetCharacterMovement()->JumpZVelocity = 600.f;
-	GetCharacterMovement()->AirControl = 0.2f;
-
-	// Create a camera boom (pulls in towards the player if there is a collision)
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
-	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 300.0f; // The camera follows at this distance behind the character	
-	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
-
-	// Create a follow camera
-	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
-	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
-	FollowCamera->SetRelativeLocation(FVector(70.0f, 70.0f, 70.0f));
-	FollowCamera->SetRelativeRotation(FRotator(0.0f,355.0f,0.0f));
-	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
+	GetCharacterMovement()->AirControl = 0.2f;	
 	
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
@@ -82,8 +69,7 @@ ATPSCharacter::ATPSCharacter()
 
 	ArmLegthSpeed = 25.0f;
 
-	IsDeath = false;
-	IsMonster = false;
+	IsDeath = false;	
 	IsSprint = false;
 
 	TPSPlayerController = NULL;
@@ -219,50 +205,11 @@ void ATPSCharacter::BeginPlay()
 	TPSAnimInstance = Cast<UTPSAnimInstance>(GetMesh()->GetAnimInstance());
 
 	SetControlMode(E_CONTROL_MODE::NORMAL);
-
-	if(!IsMonster)
-	{
-		//LOG_WARNING(TEXT("Character Controller Setting start"));
-
-		// 컨트롤러 셋팅
-		TPSPlayerController = Cast<ATPSPlayerController>(GetController());
-		ASSERT_CHECK(TPSPlayerController != nullptr);
-
-		if(TPSPlayerController)
-		{
-			// 플레이어 스테이트 셋팅
-			TPSPlayerState = TPSPlayerController->GetPlayerState<ATPSPlayerState>();
-			ASSERT_CHECK(TPSPlayerState != nullptr);
-
-			TPSPlayerState->SetDefaultWalkSpeed(GetCharacterMovement()->MaxWalkSpeed);
-			TPSPlayerState->SetRunMultiplier(5.0f);
-
-			TPSPlayerController->SettingWidget();
-
-			TPSPlayerState->SetMaxBulletCount(Weapon->GetMaxBulletNum());
-			TPSPlayerState->SetBulletCount(GetCurrentBulletNum());
-		}
-
-		// EQS에서 플레이어 검출에 사용할 플레이어 태그 추가
-		Tags.Add(FName("Player"));
-
-		//LOG_WARNING(TEXT("Character Controller Setting end"));
-	}
-	else
-	{
-		
-	}
 }
 
 void ATPSCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	// 카메라 암 이동 방법
-	//CameraBoom->TargetArmLength = FMath::FInterpTo(CameraBoom->TargetArmLength, ArmLegthTo, DeltaTime, ArmLegthSpeed);
-	
-	// 카메라 필드오브뷰 축소방법
-	FollowCamera->FieldOfView = FMath::FInterpTo(FollowCamera->FieldOfView, ArmLegthTo, DeltaTime, ArmLegthSpeed);
 
 	if (GetIsFiring() && GetCurrentBulletNum() > 0)
 	{
@@ -302,13 +249,7 @@ void ATPSCharacter::Tick(float DeltaTime)
 		}
 	}
 
-	/*switch (CurrentColtrolMode)
-	{
-	case EControlMode::TPS:
-	case EControlMode::ZOOM:
-		CameraBoom->SetRelativeRotation(FMath::RInterpTo(CameraBoom->GetRelativeRotation(), ArmRotationTo, DeltaTime, ArmRotationSpeed));
-		break;
-	}*/
+
 }
 
 
@@ -472,24 +413,6 @@ void ATPSCharacter::MoveRight(float Value)
 	}
 }
 
-
-float ATPSCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
-{
-	float FinalDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
-	
-	if (TPSPlayerState)
-		TPSPlayerState->SetDamage(FinalDamage);
-
-	if (TPSPlayerState->GetCurrentHP() <= 0)
-	{
-		StartDeathAction();
-	}
-
-	LOG_WARNING(TEXT("Take Damage!! Player"));
-
-	return FinalDamage;
-}
-
 ETeamAttitude::Type ATPSCharacter::CompareTeamAttribute(const ATPSCharacter& OtherCharacter)
 {
 	ETeamAttitude::Type OtherType = ETeamAttitude::Neutral;
@@ -499,9 +422,7 @@ ETeamAttitude::Type ATPSCharacter::CompareTeamAttribute(const ATPSCharacter& Oth
 
 	if(IsPlayerControlled())
 	{
-		ATPSPlayerController* PlayerController = Cast<ATPSPlayerController>(GetController());
-		if(PlayerController)
-			TeamID = PlayerController->GetGenericTeamId();
+		
 	}
 	else
 	{	

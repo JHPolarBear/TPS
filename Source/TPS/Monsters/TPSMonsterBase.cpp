@@ -14,9 +14,8 @@
 
 ATPSMonsterBase::ATPSMonsterBase()
 {
-	// Disable Camera component's tick
-	GetCameraBoom()->Deactivate();
-	GetFollowCamera()->Deactivate();
+	CameraBoom = nullptr;
+	FollowCamera = nullptr;
 
 	MonsterStat = CreateDefaultSubobject<UTPSMonsterBase_StatComponent>(TEXT("StatComponent"));
 
@@ -85,7 +84,7 @@ void ATPSMonsterBase::BeginPlay()
 
 float ATPSMonsterBase::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	float FinalDamage = AActor::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+	float FinalDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 	MonsterStat->SetDamage(FinalDamage);
 
 	//LOG_WARNING(TEXT("Take Damage!! Monster"));

@@ -1,7 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "TPSGameMode.h"
-#include "Characters/TPSCharacter.h"
+#include "Characters/TPSPlayer.h"
 #include "Characters/TPSPlayerController.h"
 #include "GameSystem/TPSGameState.h"
 #include "UObject/ConstructorHelpers.h"
@@ -11,7 +11,7 @@ ATPSGameMode::ATPSGameMode()
 	: Super()
 {
 	// 전용 플레이어 스테이트 사용
-	DefaultPawnClass = ATPSCharacter::StaticClass();
+	DefaultPawnClass = ATPSPlayer::StaticClass();
 	// use our custom HUD class
 	HUDClass = ATPSHUD::StaticClass();
 	PlayerControllerClass = ATPSPlayerController::StaticClass();

@@ -127,7 +127,7 @@ void ATPSAIController_MonsterBase::OnTargetPerceptionInfoUpdated(const FActorPer
 
 	ATPSCharacter* Player = Cast<ATPSCharacter>(UpdateInfo.Target);
 	
-	if(Player)
+	if(Player && Player->IsValidLowLevel())
 	{
 		LOG_WARNING(TEXT("Current player : %s, Indicated Player Info : %s"), *(this->GetPawn()->GetName()), *Player->GetName());
 
